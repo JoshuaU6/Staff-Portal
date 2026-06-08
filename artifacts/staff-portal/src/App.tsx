@@ -61,7 +61,8 @@ const clerkPubKey = publishableKeyFromHost(
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 );
 
-// Empty in dev (Clerk hits dev FAPI directly); auto-set by Replit in prod.
+// Empty in dev (Clerk hits dev FAPI directly); set VITE_CLERK_PROXY_URL in prod
+// when running behind a custom domain to enable Clerk proxy mode.
 // Do NOT gate on import.meta.env.PROD — the empty dev value is intentional.
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL as string | undefined;
 
@@ -227,17 +228,37 @@ function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
   return <PolicyGate policy={policy} onAcknowledge={handleAcknowledge} />;
 }
 
+/**
+ * LoginForm — two-stage: credentials → optional TOTP second factor.
+ *
+ * Stage 1 ("credentials"): email + password → POST /api/auth/login-ticket →
+ *   signIn.create({ strategy: "ticket" })
+ *   - If Clerk returns status "complete" → done, redirect.
+ *   - If Clerk returns status "needs_second_factor" → advance to Stage 2.
+ *
+ * Stage 2 ("mfa"): user enters 6-digit TOTP code →
+ *   signIn.attemptSecondFactor({ strategy: "totp", code })
+ *   - On complete → redirect to dashboard.
+ *
+ * MFA enrollment is managed in the user's Profile page via Clerk's hosted
+ * User Profile component, or by the admin in the Clerk dashboard.
+ */
 function LoginForm() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+
+  // Stage: "credentials" | "mfa"
+  const [stage, setStage] = useState<"credentials" | "mfa">("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
+  const [totpCode, setTotpCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /* ── Stage 1: credentials ──────────────────────────────────────────────── */
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded || !signIn) {
       setError("Authentication not ready — please refresh the page and try again.");
@@ -261,11 +282,13 @@ function LoginForm() {
       const result = await signIn.create({ strategy: "ticket", ticket: data.ticket! });
 
       if (result.status === "complete") {
-        // Hard redirect after setActive so the page reloads with the session cookie
-        // already in place — avoids the race where Clerk's React state hasn't updated
-        // yet and RequireAuth would incorrectly redirect back to /login.
         await setActive({ session: result.createdSessionId });
         window.location.replace(basePath + "/dashboard");
+      } else if (result.status === "needs_second_factor") {
+        // MFA is enabled on this account — advance to TOTP stage
+        setStage("mfa");
+        setTotpCode("");
+        setError(null);
       } else {
         setError(`Sign-in returned status "${result.status}". Please reset accounts at /portal/setup and try again.`);
       }
@@ -277,12 +300,107 @@ function LoginForm() {
     }
   };
 
+  /* ── Stage 2: TOTP second factor ───────────────────────────────────────── */
+  const handleMfaSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoaded || !signIn) return;
+    const code = totpCode.replace(/\s/g, "");
+    if (code.length !== 6) {
+      setError("Please enter the 6-digit code from your authenticator app.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await signIn.attemptSecondFactor({ strategy: "totp", code });
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        window.location.replace(basePath + "/dashboard");
+      } else {
+        setError("Verification failed. Please try again.");
+      }
+    } catch (err: any) {
+      const clerkErr = err?.errors?.[0];
+      if (clerkErr?.code === "form_code_incorrect") {
+        setError("Incorrect code. Please check your authenticator app and try again.");
+      } else {
+        setError(clerkErr?.longMessage ?? err?.message ?? "Verification failed.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const input = `w-full h-10 px-3 rounded-lg border text-sm outline-none transition-colors focus:ring-2 focus:ring-[#C0001A]/40 ${isDark ? "bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#C0001A]/60" : "bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-[#C0001A]"}`;
   const label = `block text-xs font-medium uppercase tracking-wider mb-1.5 ${isDark ? "text-white/50" : "text-muted-foreground"}`;
 
+  /* ── MFA stage UI ──────────────────────────────────────────────────────── */
+  if (stage === "mfa") {
+    return (
+      <div className={`rounded-xl shadow-xl border p-8 ${isDark ? "bg-[#161616] border-white/10" : "bg-card border-border"}`}>
+        <div className="flex items-center gap-2 mb-5">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isDark ? "bg-[#C0001A]/20" : "bg-[#C0001A]/10"}`}>
+            <AlertCircle className="w-4 h-4 text-[#C0001A]" />
+          </div>
+          <div>
+            <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-foreground"}`}>Two-factor verification</p>
+            <p className={`text-xs ${isDark ? "text-white/50" : "text-muted-foreground"}`}>Enter the code from your authenticator app</p>
+          </div>
+        </div>
+        <form onSubmit={handleMfaSubmit} className="space-y-4">
+          <div>
+            <label className={label} htmlFor="mfa-code">Authenticator code</label>
+            <input
+              id="mfa-code"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9 ]*"
+              maxLength={7}
+              autoComplete="one-time-code"
+              autoFocus
+              required
+              value={totpCode}
+              onChange={(e) => {
+                // Auto-format as "123 456"
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
+                setTotpCode(raw.length > 3 ? raw.slice(0, 3) + " " + raw.slice(3) : raw);
+              }}
+              className={`${input} text-center text-xl tracking-[0.4em] font-mono`}
+              placeholder="000 000"
+              data-testid="mfa-code-input"
+            />
+          </div>
+          {error && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+              <p className="text-xs text-red-500">{error}</p>
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={loading || totpCode.replace(/\s/g, "").length !== 6}
+            className="w-full h-10 bg-[#C0001A] hover:bg-[#a0001a] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+            data-testid="mfa-submit"
+          >
+            {loading ? "Verifying…" : "Verify"}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setStage("credentials"); setError(null); setTotpCode(""); }}
+            className={`w-full text-xs underline ${isDark ? "text-white/40 hover:text-white/60" : "text-muted-foreground hover:text-foreground"}`}
+            data-testid="mfa-back"
+          >
+            Back to sign in
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  /* ── Credentials stage UI ──────────────────────────────────────────────── */
   return (
     <div className={`rounded-xl shadow-xl border p-8 ${isDark ? "bg-[#161616] border-white/10" : "bg-card border-border"}`}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleCredentialsSubmit} className="space-y-4">
         <div>
           <label className={label} htmlFor="login-email">Email address</label>
           <input

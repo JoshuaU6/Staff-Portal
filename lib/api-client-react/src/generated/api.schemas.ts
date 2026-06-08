@@ -340,8 +340,22 @@ export interface DashboardSummary {
   totalDepartments: number;
   openTasks: number;
   pendingAlerts: number;
-  recentLogins: number;
-  failedLoginsLast7Days: number;
+  recentLogins?: number;
+  failedLoginsLast7Days?: number;
+}
+
+export interface OnlineUserRecord {
+  userId: number;
+  fullName: string;
+  role: string;
+  ipAddress?: string | null;
+  country?: string | null;
+  sessionStartedAt: string;
+}
+
+export interface OnlineUsersResponse {
+  count: number;
+  users: OnlineUserRecord[];
 }
 
 export interface LockEvent {
@@ -456,4 +470,3 @@ export const ListMessagesBox = {
 export type GetRecentActivityParams = {
 limit?: number;
 };
-

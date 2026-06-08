@@ -854,8 +854,8 @@ export const GetDashboardSummaryResponse = zod.object({
   "totalDepartments": zod.number(),
   "openTasks": zod.number(),
   "pendingAlerts": zod.number(),
-  "recentLogins": zod.number(),
-  "failedLoginsLast7Days": zod.number()
+  "recentLogins": zod.number().optional(),
+  "failedLoginsLast7Days": zod.number().optional()
 })
 
 
@@ -877,6 +877,22 @@ export const GetRecentActivityResponseItem = zod.object({
   "createdAt": zod.string()
 })
 export const GetRecentActivityResponse = zod.array(GetRecentActivityResponseItem)
+
+
+/**
+ * @summary Get count and list of users online in the last 5 minutes
+ */
+export const GetOnlineUsersResponse = zod.object({
+  "count": zod.number(),
+  "users": zod.array(zod.object({
+  "userId": zod.number(),
+  "fullName": zod.string(),
+  "role": zod.string(),
+  "ipAddress": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "sessionStartedAt": zod.string()
+}))
+})
 
 
 /**

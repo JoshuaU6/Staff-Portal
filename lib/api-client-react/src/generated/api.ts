@@ -53,6 +53,7 @@ import type {
   LoginEventBody,
   MessageItem,
   MessageResponse,
+  OnlineUsersResponse,
   PolicyComplianceReport,
   PolicyVersion,
   PolicyWithAck,
@@ -3865,6 +3866,83 @@ export function useGetRecentActivity<TData = Awaited<ReturnType<typeof getRecent
 
 
 
+export const getGetOnlineUsersUrl = () => {
+
+
+
+
+  return `/api/dashboard/online`
+}
+
+/**
+ * @summary Get count and list of users online in the last 5 minutes
+ */
+export const getOnlineUsers = async ( options?: RequestInit): Promise<OnlineUsersResponse> => {
+
+  return customFetch<OnlineUsersResponse>(getGetOnlineUsersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOnlineUsersQueryKey = () => {
+    return [
+    `/api/dashboard/online`
+    ] as const;
+    }
+
+
+export const getGetOnlineUsersQueryOptions = <TData = Awaited<ReturnType<typeof getOnlineUsers>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOnlineUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOnlineUsersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOnlineUsers>>> = ({ signal }) => getOnlineUsers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOnlineUsers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOnlineUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getOnlineUsers>>>
+export type GetOnlineUsersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get count and list of users online in the last 5 minutes
+ */
+
+export function useGetOnlineUsers<TData = Awaited<ReturnType<typeof getOnlineUsers>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOnlineUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOnlineUsersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getGetLockStatusUrl = () => {
 
 
@@ -4081,4 +4159,3 @@ export const useLiftEmergencyLock = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getLiftEmergencyLockMutationOptions(options));
     }
-

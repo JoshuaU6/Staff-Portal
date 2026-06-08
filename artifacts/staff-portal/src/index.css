@@ -161,6 +161,123 @@
   }
 }
 
+/* ─── Premium micro-animations ────────────────────────────────────────────── */
+
+/* Page content fade-in on mount — applied to main content wrapper */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-testid="main-content"] > * {
+  animation: page-in 0.18s ease-out both;
+}
+
+/* Stat cards: subtle lift on hover */
+[data-testid^="stat-"] {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+[data-testid^="stat-"]:hover {
+  transform: translateY(-2px);
+}
+
+/* Table rows: smooth background transition */
+tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+/* Sidebar nav links: smooth icon + text colour transition (already has transition-all,
+   this reinforces the duration for a more polished feel) */
+nav a, nav button {
+  transition-duration: 120ms;
+}
+
+/* Badge pulse — used on the notification bell and online indicator */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Skeleton shimmer — used by loading states */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--accent)) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* Button press micro-interaction */
+button:not(:disabled):active {
+  transform: scale(0.975);
+  transition: transform 0.08s ease;
+}
+
+/* Alert/toast slide-in */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+[data-radix-toast-viewport] > li {
+  animation: slide-in-right 0.2s ease-out both;
+}
+
+/* ─── Mobile responsiveness audit fixes ───────────────────────────────────── */
+
+/* Ensure stat grids don't overflow on narrow screens */
+@media (max-width: 380px) {
+  [data-testid="admin-stats-grid"] {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Collapse table columns that aren't critical on very small screens */
+  .hide-on-xs {
+    display: none;
+  }
+}
+
+/* Touch-friendly tap targets — ensure all interactive elements are ≥44px tall */
+@media (pointer: coarse) {
+  button, a[role="button"], [role="menuitem"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception: icon-only small buttons in table rows keep their size */
+  button.icon-sm {
+    min-height: unset;
+    min-width: unset;
+  }
+}
+
+/* Prevent horizontal overflow on main content on mobile */
+[data-testid="main-content"] {
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
 /* Modern thin scrollbar for sidebar nav */
 .sidebar-scroll {
   scrollbar-width: thin;
@@ -178,4 +295,17 @@
 }
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sidebar-accent));
+}
+
+/* Global thin scrollbar for main content area */
+[data-testid="main-content"] {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+[data-testid="main-content"]::-webkit-scrollbar {
+  width: 4px;
+}
+[data-testid="main-content"]::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 99px;
 }

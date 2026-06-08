@@ -36,6 +36,59 @@ router.get("/dashboard/summary", requireAdmin, async (_req: Request, res: Respon
   });
 });
 
+/**
+ * GET /api/dashboard/online
+ *
+ * Returns the count of users with an active session started within the last
+ * 5 minutes — used as a proxy for "currently online" since we don't maintain
+ * heartbeat timestamps on the sessions table.
+ * Also returns the list of those users for the live online panel.
+ */
+router.get("/dashboard/online", requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
+  const activeSessions = await db
+    .select({
+      sessionId: sessionsTable.id,
+      userId: sessionsTable.userId,
+      ipAddress: sessionsTable.ipAddress,
+      country: sessionsTable.country,
+      startedAt: sessionsTable.startedAt,
+    })
+    .from(sessionsTable)
+    .where(
+      and(
+        eq(sessionsTable.status, "active"),
+        gte(sessionsTable.startedAt, fiveMinutesAgo),
+      ),
+    );
+
+  // Deduplicate by userId (a user may have multiple active sessions)
+  const uniqueUserIds = [...new Set(activeSessions.map((s) => s.userId))];
+
+  const userRows = uniqueUserIds.length > 0
+    ? await db
+        .select({ id: usersTable.id, fullName: usersTable.fullName, role: usersTable.role })
+        .from(usersTable)
+    : [];
+  const userMap = new Map(userRows.map((u) => [u.id, u]));
+
+  const online = uniqueUserIds.map((uid) => {
+    const session = activeSessions.find((s) => s.userId === uid)!;
+    const user = userMap.get(uid);
+    return {
+      userId: uid,
+      fullName: user?.fullName ?? "Unknown",
+      role: user?.role ?? "staff",
+      ipAddress: session.ipAddress,
+      country: session.country,
+      sessionStartedAt: session.startedAt.toISOString(),
+    };
+  });
+
+  res.json({ count: online.length, users: online });
+});
+
 router.get("/dashboard/activity", requireAuth, async (req: Request, res: Response): Promise<void> => {
   const query = GetRecentActivityQueryParams.safeParse(req.query);
   const limit = (query.success && query.data.limit) ? Number(query.data.limit) : 20;

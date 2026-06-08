@@ -1,8 +1,14 @@
 import AppLayout from "@/components/layout/AppLayout";
-import { useGetDashboardSummary, getGetDashboardSummaryQueryKey } from "@workspace/api-client-react";
-import { Users, UserCheck, UserX, Building2, CheckSquare, Shield, Activity, Clock, AlertTriangle } from "lucide-react";
+import {
+  useGetDashboardSummary,
+  getGetDashboardSummaryQueryKey,
+  useGetOnlineUsers,
+  getGetOnlineUsersQueryKey,
+} from "@workspace/api-client-react";
+import { Users, UserCheck, UserX, Building2, CheckSquare, Shield, Activity, Clock, AlertTriangle, Wifi, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
+import { formatDistanceToNow } from "date-fns";
 
 const STAT_CONFIG = [
   { key: "totalUsers", label: "Total Staff", icon: Users, color: "text-blue-400", href: "/admin/users" },
@@ -16,10 +22,33 @@ const STAT_CONFIG = [
   { key: "failedLoginsLast7Days", label: "Failed Logins (7d)", icon: AlertTriangle, color: "text-red-400", href: "/admin/audit-logs" },
 ];
 
+const ROLE_LABELS: Record<string, string> = {
+  chairman: "Chairman",
+  ict_admin: "ICT Admin",
+  hr_admin: "HR Admin",
+  compliance_admin: "Compliance",
+  auditor: "Auditor",
+  department_head: "Dept Head",
+  manager: "Manager",
+  supervisor: "Supervisor",
+  staff: "Staff",
+};
+
 export default function AdminOverviewPage() {
   const { data: summary, isLoading } = useGetDashboardSummary({
     query: { queryKey: getGetDashboardSummaryQueryKey() },
   });
+
+  // Poll online users every 30 seconds
+  const { data: onlineData, isLoading: onlineLoading } = useGetOnlineUsers({
+    query: {
+      queryKey: getGetOnlineUsersQueryKey(),
+      refetchInterval: 30_000,
+    },
+  });
+
+  const onlineCount = onlineData?.count ?? 0;
+  const onlineUsers = onlineData?.users ?? [];
 
   return (
     <AppLayout title="Admin Overview">
@@ -29,8 +58,21 @@ export default function AdminOverviewPage() {
             <h2 className="text-lg font-semibold text-foreground">Control Center</h2>
             <p className="text-sm text-muted-foreground mt-0.5">Organization-wide metrics and quick access</p>
           </div>
-          <div className="text-xs font-mono text-muted-foreground bg-muted px-3 py-1.5 rounded-sm border border-border shrink-0">
-            Live
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Live online badge */}
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold border bg-green-500/10 text-green-400 border-green-500/20"
+              data-testid="online-count-badge"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+              </span>
+              {onlineLoading ? "—" : onlineCount} online now
+            </div>
+            <div className="text-xs font-mono text-muted-foreground bg-muted px-3 py-1.5 rounded-sm border border-border">
+              Live
+            </div>
           </div>
         </div>
 
@@ -51,6 +93,51 @@ export default function AdminOverviewPage() {
               </p>
             </Link>
           ))}
+        </div>
+
+        {/* Live online users panel */}
+        <div className="bg-card border border-border rounded-sm" data-testid="online-users-panel">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Wifi className="h-4 w-4 text-green-400" />
+              <h3 className="text-sm font-semibold text-foreground">Live Online Users</h3>
+              <span className="text-xs text-muted-foreground">(active sessions in last 5 min)</span>
+            </div>
+            <span className="text-xs font-mono text-muted-foreground">auto-refreshes every 30s</span>
+          </div>
+          <div className="divide-y divide-border" data-testid="online-users-list">
+            {onlineLoading ? (
+              <div className="px-5 py-4 text-sm text-muted-foreground">Loading…</div>
+            ) : onlineUsers.length === 0 ? (
+              <div className="px-5 py-8 text-sm text-muted-foreground text-center">No active sessions in the last 5 minutes</div>
+            ) : (
+              onlineUsers.map((u) => (
+                <div key={u.userId} className="px-5 py-3 flex items-center justify-between gap-4" data-testid={`online-user-${u.userId}`}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
+                      {u.fullName[0]?.toUpperCase() ?? "?"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{u.fullName}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{ROLE_LABELS[u.role] ?? u.role}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0 text-xs text-muted-foreground">
+                    {u.country && (
+                      <span className="flex items-center gap-1">
+                        <Globe className="h-3 w-3" />
+                        {u.country}
+                      </span>
+                    )}
+                    {u.ipAddress && (
+                      <span className="font-mono hidden sm:block">{u.ipAddress}</span>
+                    )}
+                    <span>{formatDistanceToNow(new Date(u.sessionStartedAt), { addSuffix: true })}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -86,6 +173,8 @@ export default function AdminOverviewPage() {
                 { label: "Document Storage", status: "Operational" },
                 { label: "Audit Logging", status: "Active" },
                 { label: "Session Monitor", status: "Active" },
+                { label: "MFA (TOTP)", status: "Configured" },
+                { label: "Account Lockout", status: "Active" },
               ].map(({ label, status }) => (
                 <div key={label} className="flex items-center justify-between" data-testid={`system-status-${label.toLowerCase().replace(/ /g, "-")}`}>
                   <span className="text-sm text-muted-foreground">{label}</span>

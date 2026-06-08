@@ -1029,6 +1029,19 @@ paths:
                 items:
                   $ref: "#/components/schemas/AuditLog"
 
+  /dashboard/online:
+    get:
+      operationId: getOnlineUsers
+      tags: [dashboard]
+      summary: Get count and list of users online in the last 5 minutes
+      responses:
+        "200":
+          description: Online users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OnlineUsersResponse"
+
   # ─── Chairman ────────────────────────────────────────────────────────────────
   /chairman/lock-status:
     get:
@@ -1745,6 +1758,42 @@ components:
         - totalDepartments
         - openTasks
         - pendingAlerts
+
+    OnlineUserRecord:
+      type: object
+      properties:
+        userId:
+          type: integer
+        fullName:
+          type: string
+        role:
+          type: string
+        ipAddress:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        sessionStartedAt:
+          type: string
+      required:
+        - userId
+        - fullName
+        - role
+        - sessionStartedAt
+
+    OnlineUsersResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/OnlineUserRecord"
+      required:
+        - count
+        - users
         - recentLogins
         - failedLoginsLast7Days
 
