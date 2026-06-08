@@ -1,17 +1,46 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "isolatedModules": true,
+    "lib": ["es2022"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "types": ["node"],
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["node"]
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "express": ["node_modules/@types/express/index.d.ts"],
+      "cors": ["node_modules/@types/cors/index.d.ts"],
+      "multer": ["node_modules/@types/multer/index.d.ts"],
+      "pino": ["node_modules/pino/pino.d.ts"],
+      "pino-http": ["node_modules/pino-http/index.d.ts"],
+      "http-proxy-middleware": ["node_modules/http-proxy-middleware/dist/index.d.ts"],
+      "@clerk/express": ["node_modules/@clerk/express/dist/index.d.ts"],
+      "@clerk/shared/keys": ["node_modules/@clerk/shared/dist/runtime/keys.d.ts"],
+      "@aws-sdk/client-s3": ["node_modules/@aws-sdk/client-s3/dist-types/index.d.ts"],
+      "@aws-sdk/s3-request-presigner": ["node_modules/@aws-sdk/s3-request-presigner/dist-types/index.d.ts"]
+    }
   },
   "include": ["src"],
   "references": [
-    {
-      "path": "../../lib/db"
-    },
-    {
-      "path": "../../lib/api-zod"
-    }
+    { "path": "../../lib/db" },
+    { "path": "../../lib/api-zod" }
   ]
 }
