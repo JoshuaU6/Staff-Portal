@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "staff": "Personnel",
+    "dashboard": "Tableau de bord",
+    "department": "Mon département",
+    "tasks": "Mes tâches",
+    "documents": "Documents",
+    "announcements": "Annonces",
+    "profile": "Mon profil",
+    "messages": "Messages",
+    "administration": "Administration",
+    "admin_overview": "Vue d'ensemble",
+    "user_management": "Gestion des utilisateurs",
+    "departments": "Départements",
+    "task_management": "Gestion des tâches",
+    "audit_logs": "Journaux d'audit",
+    "active_sessions": "Sessions actives",
+    "security_alerts": "Alertes de sécurité",
+    "policy_compliance": "Conformité aux politiques",
+    "emergency_controls": "Contrôles d'urgence",
+    "back_to_website": "Site web MTC Group",
+    "sign_out": "Se déconnecter"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "export_csv": "Exporter CSV",
+    "actions": "Actions",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "delete": "Supprimer",
+    "reply": "Répondre",
+    "send": "Envoyer",
+    "compose": "Rédiger",
+    "status": {
+      "active": "Actif",
+      "pending": "En attente",
+      "suspended": "Suspendu",
+      "archived": "Archivé"
+    },
+    "roles": {
+      "chairman": "Président",
+      "ict_admin": "Admin TIC",
+      "hr_admin": "Admin RH",
+      "compliance_admin": "Admin conformité",
+      "auditor": "Auditeur",
+      "department_head": "Chef de département",
+      "manager": "Manager",
+      "supervisor": "Superviseur",
+      "staff": "Personnel"
+    }
+  },
+  "auth": {
+    "login_title": "Connexion au portail",
+    "login_subtitle": "Connectez-vous avec vos identifiants MTC",
+    "register_title": "Créer un compte",
+    "register_subtitle": "Inscrivez-vous avec vos identifiants MTC"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Communication interne du personnel",
+    "inbox": "Boîte de réception",
+    "sent": "Envoyés",
+    "no_messages": "Aucun message",
+    "nothing_sent": "Rien d'envoyé",
+    "select_message": "Sélectionner un message",
+    "select_hint": "Choisissez un message dans la liste",
+    "new_message": "Nouveau message",
+    "subject": "Objet",
+    "message": "Message",
+    "to": "À",
+    "scope": "Portée",
+    "scope_individual": "Membre du personnel individuel",
+    "scope_all": "Tout le personnel",
+    "sending": "Envoi en cours...",
+    "sent_ok": "Message envoyé",
+    "deleted": "Message supprimé"
+  },
+  "devices": {
+    "title": "Appareils de confiance",
+    "subtitle": "Appareils ayant accédé à votre compte",
+    "revoke": "Révoquer",
+    "revoked": "Révoqué",
+    "trusted_at": "Approuvé le",
+    "last_seen": "Dernière activité",
+    "no_devices": "Aucun appareil de confiance"
+  }
+}

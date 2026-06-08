@@ -1,0 +1,40 @@
+import { Router, type IRouter } from "express";
+import healthRouter from "./health";
+import bootstrapRouter from "./bootstrap";
+import authRouter from "./auth";
+import usersRouter from "./users";
+import departmentsRouter from "./departments";
+import announcementsRouter from "./announcements";
+import tasksRouter from "./tasks";
+import documentsRouter from "./documents";
+import auditRouter from "./audit";
+import sessionsRouter from "./sessions";
+import alertsRouter from "./alerts";
+import dashboardRouter from "./dashboard";
+import policyRouter from "./policy";
+import devicesRouter from "./devices";
+import messagesRouter from "./messages";
+import loginEventRouter from "./login-event";
+import chairmanRouter from "./chairman";
+
+const router: IRouter = Router();
+
+router.use(healthRouter);
+router.use(bootstrapRouter);
+router.use(authRouter);
+router.use(usersRouter);
+router.use(departmentsRouter);
+router.use(announcementsRouter);
+router.use(tasksRouter);
+router.use(documentsRouter);
+router.use(auditRouter);
+router.use(sessionsRouter);
+router.use(alertsRouter);
+router.use(dashboardRouter);
+router.use(policyRouter);
+router.use(devicesRouter);
+router.use(messagesRouter);
+router.use(loginEventRouter);
+router.use(chairmanRouter);
+
+export default router;

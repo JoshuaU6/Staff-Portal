@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "staff": "Staff",
+    "dashboard": "Dashboard",
+    "department": "My Department",
+    "tasks": "My Tasks",
+    "documents": "Documents",
+    "announcements": "Announcements",
+    "profile": "My Profile",
+    "messages": "Messages",
+    "administration": "Administration",
+    "admin_overview": "Admin Overview",
+    "user_management": "User Management",
+    "departments": "Departments",
+    "task_management": "Task Management",
+    "audit_logs": "Audit Logs",
+    "active_sessions": "Active Sessions",
+    "security_alerts": "Security Alerts",
+    "policy_compliance": "Policy Compliance",
+    "emergency_controls": "Emergency Controls",
+    "back_to_website": "MTC Group Website",
+    "sign_out": "Sign Out"
+  },
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "export_csv": "Export CSV",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "delete": "Delete",
+    "reply": "Reply",
+    "send": "Send",
+    "compose": "Compose",
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "suspended": "Suspended",
+      "archived": "Archived"
+    },
+    "roles": {
+      "chairman": "Chairman",
+      "ict_admin": "ICT Admin",
+      "hr_admin": "HR Admin",
+      "compliance_admin": "Compliance Admin",
+      "auditor": "Auditor",
+      "department_head": "Dept. Head",
+      "manager": "Manager",
+      "supervisor": "Supervisor",
+      "staff": "Staff"
+    }
+  },
+  "auth": {
+    "login_title": "Staff Portal Login",
+    "login_subtitle": "Sign in with your MTC staff credentials",
+    "register_title": "Create Staff Account",
+    "register_subtitle": "Register with your MTC staff credentials"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Internal staff communication",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "no_messages": "No messages",
+    "nothing_sent": "Nothing sent yet",
+    "select_message": "Select a message",
+    "select_hint": "Choose a message from the list to read it",
+    "new_message": "New Message",
+    "subject": "Subject",
+    "message": "Message",
+    "to": "To",
+    "scope": "Scope",
+    "scope_individual": "Individual staff member",
+    "scope_all": "All staff (broadcast)",
+    "sending": "Sending...",
+    "sent_ok": "Message sent",
+    "deleted": "Message deleted"
+  },
+  "devices": {
+    "title": "Trusted Devices",
+    "subtitle": "Devices that have accessed your account",
+    "revoke": "Revoke",
+    "revoked": "Revoked",
+    "trusted_at": "Trusted",
+    "last_seen": "Last Seen",
+    "no_devices": "No trusted devices"
+  }
+}

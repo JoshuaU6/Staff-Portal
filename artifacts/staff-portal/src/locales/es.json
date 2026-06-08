@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "staff": "Personal",
+    "dashboard": "Panel",
+    "department": "Mi departamento",
+    "tasks": "Mis tareas",
+    "documents": "Documentos",
+    "announcements": "Anuncios",
+    "profile": "Mi perfil",
+    "messages": "Mensajes",
+    "administration": "Administración",
+    "admin_overview": "Resumen",
+    "user_management": "Gestión de usuarios",
+    "departments": "Departamentos",
+    "task_management": "Gestión de tareas",
+    "audit_logs": "Registros de auditoría",
+    "active_sessions": "Sesiones activas",
+    "security_alerts": "Alertas de seguridad",
+    "policy_compliance": "Cumplimiento de políticas",
+    "emergency_controls": "Controles de emergencia",
+    "back_to_website": "Sitio web MTC Group",
+    "sign_out": "Cerrar sesión"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "search": "Buscar",
+    "export_csv": "Exportar CSV",
+    "actions": "Acciones",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "delete": "Eliminar",
+    "reply": "Responder",
+    "send": "Enviar",
+    "compose": "Redactar",
+    "status": {
+      "active": "Activo",
+      "pending": "Pendiente",
+      "suspended": "Suspendido",
+      "archived": "Archivado"
+    },
+    "roles": {
+      "chairman": "Presidente",
+      "ict_admin": "Admin TIC",
+      "hr_admin": "Admin RRHH",
+      "compliance_admin": "Admin cumplimiento",
+      "auditor": "Auditor",
+      "department_head": "Jefe de departamento",
+      "manager": "Gerente",
+      "supervisor": "Supervisor",
+      "staff": "Personal"
+    }
+  },
+  "auth": {
+    "login_title": "Inicio de sesión del portal",
+    "login_subtitle": "Inicia sesión con tus credenciales MTC",
+    "register_title": "Crear cuenta de personal",
+    "register_subtitle": "Regístrate con tus credenciales MTC"
+  },
+  "messages": {
+    "title": "Mensajes",
+    "subtitle": "Comunicación interna del personal",
+    "inbox": "Bandeja de entrada",
+    "sent": "Enviados",
+    "no_messages": "Sin mensajes",
+    "nothing_sent": "Nada enviado aún",
+    "select_message": "Seleccionar mensaje",
+    "select_hint": "Elige un mensaje de la lista para leerlo",
+    "new_message": "Nuevo mensaje",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "to": "Para",
+    "scope": "Alcance",
+    "scope_individual": "Miembro del personal individual",
+    "scope_all": "Todo el personal",
+    "sending": "Enviando...",
+    "sent_ok": "Mensaje enviado",
+    "deleted": "Mensaje eliminado"
+  },
+  "devices": {
+    "title": "Dispositivos de confianza",
+    "subtitle": "Dispositivos que han accedido a tu cuenta",
+    "revoke": "Revocar",
+    "revoked": "Revocado",
+    "trusted_at": "De confianza desde",
+    "last_seen": "Última actividad",
+    "no_devices": "Sin dispositivos de confianza"
+  }
+}

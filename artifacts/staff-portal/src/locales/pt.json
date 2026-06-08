@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "staff": "Funcionários",
+    "dashboard": "Painel",
+    "department": "Meu departamento",
+    "tasks": "Minhas tarefas",
+    "documents": "Documentos",
+    "announcements": "Anúncios",
+    "profile": "Meu perfil",
+    "messages": "Mensagens",
+    "administration": "Administração",
+    "admin_overview": "Visão geral",
+    "user_management": "Gestão de utilizadores",
+    "departments": "Departamentos",
+    "task_management": "Gestão de tarefas",
+    "audit_logs": "Registos de auditoria",
+    "active_sessions": "Sessões ativas",
+    "security_alerts": "Alertas de segurança",
+    "policy_compliance": "Conformidade com políticas",
+    "emergency_controls": "Controlos de emergência",
+    "back_to_website": "Site MTC Group",
+    "sign_out": "Terminar sessão"
+  },
+  "common": {
+    "loading": "A carregar...",
+    "search": "Pesquisar",
+    "export_csv": "Exportar CSV",
+    "actions": "Ações",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Fechar",
+    "delete": "Eliminar",
+    "reply": "Responder",
+    "send": "Enviar",
+    "compose": "Redigir",
+    "status": {
+      "active": "Ativo",
+      "pending": "Pendente",
+      "suspended": "Suspenso",
+      "archived": "Arquivado"
+    },
+    "roles": {
+      "chairman": "Presidente",
+      "ict_admin": "Admin TIC",
+      "hr_admin": "Admin RH",
+      "compliance_admin": "Admin conformidade",
+      "auditor": "Auditor",
+      "department_head": "Chefe de departamento",
+      "manager": "Gestor",
+      "supervisor": "Supervisor",
+      "staff": "Funcionário"
+    }
+  },
+  "auth": {
+    "login_title": "Login do Portal de Funcionários",
+    "login_subtitle": "Inicie sessão com as suas credenciais MTC",
+    "register_title": "Criar conta de funcionário",
+    "register_subtitle": "Registe-se com as suas credenciais MTC"
+  },
+  "messages": {
+    "title": "Mensagens",
+    "subtitle": "Comunicação interna de funcionários",
+    "inbox": "Caixa de entrada",
+    "sent": "Enviados",
+    "no_messages": "Sem mensagens",
+    "nothing_sent": "Nada enviado ainda",
+    "select_message": "Selecionar mensagem",
+    "select_hint": "Escolha uma mensagem da lista para ler",
+    "new_message": "Nova mensagem",
+    "subject": "Assunto",
+    "message": "Mensagem",
+    "to": "Para",
+    "scope": "Âmbito",
+    "scope_individual": "Funcionário individual",
+    "scope_all": "Todos os funcionários",
+    "sending": "A enviar...",
+    "sent_ok": "Mensagem enviada",
+    "deleted": "Mensagem eliminada"
+  },
+  "devices": {
+    "title": "Dispositivos confiáveis",
+    "subtitle": "Dispositivos que acederam à sua conta",
+    "revoke": "Revogar",
+    "revoked": "Revogado",
+    "trusted_at": "Confiável desde",
+    "last_seen": "Última atividade",
+    "no_devices": "Sem dispositivos confiáveis"
+  }
+}

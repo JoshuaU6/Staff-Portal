@@ -1,0 +1,1814 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: MTC Group Staff Portal API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: users
+    description: User management
+  - name: departments
+    description: Department management
+  - name: announcements
+    description: Company announcements
+  - name: tasks
+    description: Staff tasks
+  - name: documents
+    description: Secure documents
+  - name: audit
+    description: Audit logs
+  - name: sessions
+    description: Session management
+  - name: alerts
+    description: Security alerts
+  - name: dashboard
+    description: Dashboard summaries
+  - name: policy
+    description: Staff policy management and compliance
+  - name: devices
+    description: Trusted device management
+  - name: messages
+    description: Internal staff messaging
+  - name: auth
+    description: Authentication and login event operations
+  - name: chairman
+    description: Chairman-only emergency controls
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Users ───────────────────────────────────────────────────────────────────
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: department_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: role
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create a new staff user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/me:
+    get:
+      operationId: getCurrentUser
+      tags: [users]
+      summary: Get current authenticated user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/approve:
+    post:
+      operationId: approveUser
+      tags: [users]
+      summary: Approve a pending user account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/suspend:
+    post:
+      operationId: suspendUser
+      tags: [users]
+      summary: Suspend a user account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/reactivate:
+    post:
+      operationId: reactivateUser
+      tags: [users]
+      summary: Reactivate a suspended user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User reactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/force-logout:
+    post:
+      operationId: forceLogoutUser
+      tags: [users]
+      summary: Force logout all sessions for a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sessions terminated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /users/{id}/offboard:
+    post:
+      operationId: offboardUser
+      tags: [users]
+      summary: Offboard a staff member (terminate sessions, archive account)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User offboarded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # ─── Departments ─────────────────────────────────────────────────────────────
+  /departments:
+    get:
+      operationId: listDepartments
+      tags: [departments]
+      summary: List all departments
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+    post:
+      operationId: createDepartment
+      tags: [departments]
+      summary: Create a department
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDepartmentBody"
+      responses:
+        "201":
+          description: Department created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+
+  /departments/{id}:
+    get:
+      operationId: getDepartment
+      tags: [departments]
+      summary: Get a department
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Department
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+
+  /departments/{id}/members:
+    get:
+      operationId: getDepartmentMembers
+      tags: [departments]
+      summary: List staff members in a department
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Department members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  # ─── Announcements ───────────────────────────────────────────────────────────
+  /announcements:
+    get:
+      operationId: listAnnouncements
+      tags: [announcements]
+      summary: List announcements (filtered by scope)
+      parameters:
+        - name: scope
+          in: query
+          schema:
+            type: string
+        - name: department_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Announcement"
+    post:
+      operationId: createAnnouncement
+      tags: [announcements]
+      summary: Create an announcement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnnouncementBody"
+      responses:
+        "201":
+          description: Announcement created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Announcement"
+
+  /announcements/{id}:
+    get:
+      operationId: getAnnouncement
+      tags: [announcements]
+      summary: Get an announcement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Announcement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Announcement"
+    delete:
+      operationId: deleteAnnouncement
+      tags: [announcements]
+      summary: Delete an announcement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Tasks ───────────────────────────────────────────────────────────────────
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [tasks]
+      summary: List tasks
+      parameters:
+        - name: assignee_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: department_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTaskBody"
+      responses:
+        "201":
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /tasks/{id}:
+    get:
+      operationId: getTask
+      tags: [tasks]
+      summary: Get a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaskBody"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  # ─── Documents ───────────────────────────────────────────────────────────────
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [documents]
+      summary: List documents
+      parameters:
+        - name: department_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: sensitivity
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+
+  /documents/upload:
+    post:
+      operationId: uploadDocument
+      tags: [documents]
+      summary: Upload a file and create a document record (admin only)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UploadDocumentBody"
+      responses:
+        "201":
+          description: Document uploaded and created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "400":
+          description: Invalid file or missing fields
+        "403":
+          description: Forbidden
+
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      tags: [documents]
+      summary: Get a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+    delete:
+      operationId: deleteDocument
+      tags: [documents]
+      summary: Delete a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /documents/{id}/download:
+    get:
+      operationId: downloadDocument
+      tags: [documents]
+      summary: Get a pre-signed download URL for a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pre-signed download URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentDownloadResponse"
+        "403":
+          description: Access denied (confidential document requires admin)
+        "404":
+          description: Document not found
+
+  /documents/{id}/access-logs:
+    get:
+      operationId: getDocumentAccessLogs
+      tags: [documents]
+      summary: Get access history for a document (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Access log entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentAccessLog"
+        "403":
+          description: Forbidden
+
+  # ─── Audit Logs ──────────────────────────────────────────────────────────────
+  /audit-logs:
+    get:
+      operationId: listAuditLogs
+      tags: [audit]
+      summary: List audit log entries
+      parameters:
+        - name: actor_user_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditLog"
+
+  # ─── Sessions ────────────────────────────────────────────────────────────────
+  /sessions:
+    get:
+      operationId: listSessions
+      tags: [sessions]
+      summary: List sessions
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+
+  /sessions/me:
+    get:
+      operationId: getMysessions
+      tags: [sessions]
+      summary: Get sessions for the currently authenticated user
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Current user sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+
+  # ─── Security Alerts ─────────────────────────────────────────────────────────
+  /security-alerts:
+    get:
+      operationId: listSecurityAlerts
+      tags: [alerts]
+      summary: List security alerts
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Security alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SecurityAlert"
+
+  /security-alerts/{id}/resolve:
+    post:
+      operationId: resolveSecurityAlert
+      tags: [alerts]
+      summary: Mark a security alert as resolved
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Alert resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityAlert"
+
+  # ─── Policy ──────────────────────────────────────────────────────────────────
+  /policy/current:
+    get:
+      operationId: getCurrentPolicy
+      tags: [policy]
+      summary: Get the current published policy version and acknowledgment status
+      responses:
+        "200":
+          description: Current policy with acknowledgment status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyWithAck"
+        "404":
+          description: No policy published yet
+
+  /policy/acknowledge:
+    post:
+      operationId: acknowledgePolicy
+      tags: [policy]
+      summary: Acknowledge the current policy version
+      responses:
+        "200":
+          description: Acknowledgment recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcknowledgePolicyResponse"
+
+  /policy/compliance:
+    get:
+      operationId: getPolicyCompliance
+      tags: [policy]
+      summary: Get compliance status for all active staff (admin/compliance_admin only)
+      responses:
+        "200":
+          description: Compliance data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyComplianceReport"
+
+  /policy:
+    post:
+      operationId: publishPolicy
+      tags: [policy]
+      summary: Publish a new policy version (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishPolicyBody"
+      responses:
+        "201":
+          description: Policy published
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyVersion"
+
+  # ─── Auth / Login Event ──────────────────────────────────────────────────────
+  /auth/login-event:
+    post:
+      operationId: recordLoginEvent
+      tags: [auth]
+      summary: Record a successful login event and evaluate risk factors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginEventBody"
+      responses:
+        "200":
+          description: Event recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # ─── Bulk User Actions ───────────────────────────────────────────────────────
+  /users/bulk-action:
+    post:
+      operationId: bulkUserAction
+      tags: [users]
+      summary: Apply an action to multiple users at once (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkUserActionBody"
+      responses:
+        "200":
+          description: Bulk action result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkUserActionResponse"
+
+  # ─── Devices ─────────────────────────────────────────────────────────────────
+  /devices/register:
+    post:
+      operationId: registerDevice
+      tags: [devices]
+      summary: Register or update a trusted device fingerprint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDeviceBody"
+      responses:
+        "200":
+          description: Device updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "201":
+          description: Device registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+
+  /devices/me:
+    get:
+      operationId: listMyDevices
+      tags: [devices]
+      summary: List trusted devices for the current user
+      responses:
+        "200":
+          description: Device list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Device"
+
+  /devices/user/{userId}:
+    get:
+      operationId: listUserDevices
+      tags: [devices]
+      summary: List devices for a specific user (admin only)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Device list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Device"
+
+  /devices/{id}:
+    delete:
+      operationId: revokeDevice
+      tags: [devices]
+      summary: Revoke a trusted device
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Device revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # ─── Messages ─────────────────────────────────────────────────────────────────
+  /messages:
+    get:
+      operationId: listMessages
+      tags: [messages]
+      summary: List messages for the current user (inbox or sent)
+      parameters:
+        - name: box
+          in: query
+          schema:
+            type: string
+            enum: [inbox, sent]
+      responses:
+        "200":
+          description: Message list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageItem"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a new internal message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageBody"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageItem"
+
+  /messages/{id}/read:
+    patch:
+      operationId: markMessageRead
+      tags: [messages]
+      summary: Mark a message as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Message marked read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageItem"
+
+  /messages/{id}:
+    delete:
+      operationId: deleteMessage
+      tags: [messages]
+      summary: Delete a message (soft delete for sender or recipient)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # ─── Dashboard ───────────────────────────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recent activity feed
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditLog"
+
+  # ─── Chairman ────────────────────────────────────────────────────────────────
+  /chairman/lock-status:
+    get:
+      operationId: getLockStatus
+      tags: [chairman]
+      summary: Get current emergency lock status
+      responses:
+        "200":
+          description: Lock status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LockStatusResponse"
+
+  /chairman/emergency-lock:
+    post:
+      operationId: activateEmergencyLock
+      tags: [chairman]
+      summary: Activate emergency lock — suspends all non-chairman users and kills their sessions
+      responses:
+        "200":
+          description: Lock activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmergencyLockResponse"
+
+  /chairman/emergency-unlock:
+    post:
+      operationId: liftEmergencyLock
+      tags: [chairman]
+      summary: Lift emergency lock — reactivates only users suspended by the lock
+      responses:
+        "200":
+          description: Lock lifted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmergencyUnlockResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    AcknowledgePolicyResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        acknowledgedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - message
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        staffId:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        departmentId:
+          type: ["integer", "null"]
+        departmentName:
+          type: ["string", "null"]
+        clerkUserId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - staffId
+        - email
+        - fullName
+        - role
+        - status
+        - departmentId
+        - departmentName
+        - clerkUserId
+        - createdAt
+        - updatedAt
+
+    CreateUserBody:
+      type: object
+      properties:
+        staffId:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+        departmentId:
+          type: ["integer", "null"]
+      required:
+        - staffId
+        - email
+        - fullName
+        - role
+
+    UpdateUserBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+        role:
+          type: string
+        departmentId:
+          type: ["integer", "null"]
+        status:
+          type: string
+
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        parentDepartmentId:
+          type: ["integer", "null"]
+        parentDepartmentName:
+          type: ["string", "null"]
+        memberCount:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - parentDepartmentId
+        - parentDepartmentName
+        - memberCount
+        - createdAt
+
+    CreateDepartmentBody:
+      type: object
+      properties:
+        name:
+          type: string
+        parentDepartmentId:
+          type: ["integer", "null"]
+      required:
+        - name
+
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        scope:
+          type: string
+        createdByName:
+          type: ["string", "null"]
+        publishedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - body
+        - scope
+        - createdByName
+        - publishedAt
+        - createdAt
+
+    CreateAnnouncementBody:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        scope:
+          type: string
+      required:
+        - title
+        - body
+        - scope
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        assigneeId:
+          type: ["integer", "null"]
+        assigneeName:
+          type: ["string", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        status:
+          type: string
+        dueDate:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - assigneeId
+        - assigneeName
+        - departmentId
+        - status
+        - dueDate
+        - createdAt
+
+    CreateTaskBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        assigneeId:
+          type: ["integer", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        dueDate:
+          type: ["string", "null"]
+      required:
+        - title
+
+    UpdateTaskBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        dueDate:
+          type: ["string", "null"]
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        storageKey:
+          type: string
+        fileSize:
+          type: ["integer", "null"]
+        mimeType:
+          type: ["string", "null"]
+        downloadCount:
+          type: integer
+        departmentId:
+          type: ["integer", "null"]
+        sensitivity:
+          type: string
+        uploadedByName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - storageKey
+        - fileSize
+        - mimeType
+        - downloadCount
+        - departmentId
+        - sensitivity
+        - uploadedByName
+        - createdAt
+
+    UploadDocumentBody:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        name:
+          type: string
+        departmentId:
+          type: string
+        sensitivity:
+          type: string
+      required:
+        - file
+        - name
+        - sensitivity
+
+    DocumentDownloadResponse:
+      type: object
+      properties:
+        url:
+          type: string
+        expiresAt:
+          type: string
+        watermark:
+          type: string
+      required:
+        - url
+        - expiresAt
+        - watermark
+
+    DocumentAccessLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        documentId:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: ["string", "null"]
+        staffId:
+          type: ["string", "null"]
+        action:
+          type: string
+        ipAddress:
+          type: ["string", "null"]
+        accessedAt:
+          type: string
+      required:
+        - id
+        - documentId
+        - userId
+        - userName
+        - staffId
+        - action
+        - ipAddress
+        - accessedAt
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        actorUserId:
+          type: ["integer", "null"]
+        actorName:
+          type: ["string", "null"]
+        eventType:
+          type: string
+        targetType:
+          type: ["string", "null"]
+        targetId:
+          type: ["integer", "null"]
+        metadata:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - actorUserId
+        - actorName
+        - eventType
+        - targetType
+        - targetId
+        - metadata
+        - createdAt
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: ["string", "null"]
+        ipAddress:
+          type: ["string", "null"]
+        country:
+          type: ["string", "null"]
+        startedAt:
+          type: string
+        endedAt:
+          type: ["string", "null"]
+        status:
+          type: string
+      required:
+        - id
+        - userId
+        - userName
+        - ipAddress
+        - country
+        - startedAt
+        - endedAt
+        - status
+
+    SecurityAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+        severity:
+          type: string
+        userId:
+          type: ["integer", "null"]
+        userName:
+          type: ["string", "null"]
+        eventRef:
+          type: ["string", "null"]
+        status:
+          type: string
+        source:
+          type: string
+        ipAddress:
+          type: ["string", "null"]
+        country:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - severity
+        - userId
+        - userName
+        - eventRef
+        - status
+        - source
+        - ipAddress
+        - country
+        - createdAt
+
+    PolicyVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+        version:
+          type: string
+        body:
+          type: string
+        publishedAt:
+          type: string
+        publishedBy:
+          type: ["integer", "null"]
+      required:
+        - id
+        - version
+        - body
+        - publishedAt
+        - publishedBy
+
+    PolicyWithAck:
+      type: object
+      properties:
+        id:
+          type: integer
+        version:
+          type: string
+        body:
+          type: string
+        publishedAt:
+          type: string
+        publishedBy:
+          type: ["integer", "null"]
+        acknowledgedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - version
+        - body
+        - publishedAt
+        - publishedBy
+        - acknowledgedAt
+
+    PublishPolicyBody:
+      type: object
+      properties:
+        version:
+          type: string
+        body:
+          type: string
+      required:
+        - version
+        - body
+
+    ComplianceRow:
+      type: object
+      properties:
+        userId:
+          type: integer
+        staffId:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        acknowledged:
+          type: boolean
+        acknowledgedAt:
+          type: ["string", "null"]
+      required:
+        - userId
+        - staffId
+        - fullName
+        - email
+        - role
+        - acknowledged
+        - acknowledgedAt
+
+    PolicyComplianceReport:
+      type: object
+      properties:
+        policyVersion:
+          oneOf:
+            - $ref: "#/components/schemas/PolicyVersion"
+            - type: "null"
+        compliance:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComplianceRow"
+      required:
+        - policyVersion
+        - compliance
+
+    BulkUserActionBody:
+      type: object
+      properties:
+        userIds:
+          type: array
+          items:
+            type: integer
+        action:
+          type: string
+          enum: [suspend, reactivate, force_logout]
+      required:
+        - userIds
+        - action
+
+    BulkUserActionResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        affected:
+          type: integer
+      required:
+        - message
+        - affected
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        fingerprint:
+          type: string
+        userAgent:
+          type: ["string", "null"]
+        label:
+          type: ["string", "null"]
+        ipAddress:
+          type: ["string", "null"]
+        trustedAt:
+          type: string
+        revokedAt:
+          type: ["string", "null"]
+        lastSeenAt:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - userId
+        - fingerprint
+        - userAgent
+        - label
+        - ipAddress
+        - trustedAt
+        - revokedAt
+        - lastSeenAt
+        - createdAt
+
+    RegisterDeviceBody:
+      type: object
+      properties:
+        fingerprint:
+          type: string
+        userAgent:
+          type: ["string", "null"]
+        label:
+          type: ["string", "null"]
+      required:
+        - fingerprint
+
+    MessageItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromUserId:
+          type: integer
+        toUserId:
+          type: ["integer", "null"]
+        fromName:
+          type: string
+        toName:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        isRead:
+          type: boolean
+        scope:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - fromUserId
+        - toUserId
+        - fromName
+        - toName
+        - subject
+        - body
+        - isRead
+        - scope
+        - createdAt
+
+    SendMessageBody:
+      type: object
+      properties:
+        toUserId:
+          type: ["integer", "null"]
+        subject:
+          type: string
+        body:
+          type: string
+        scope:
+          type: string
+      required:
+        - subject
+        - body
+
+    LoginEventBody:
+      type: object
+      properties:
+        fingerprint:
+          type: ["string", "null"]
+        userAgent:
+          type: ["string", "null"]
+        country:
+          type: ["string", "null"]
+
+    DashboardSummary:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers:
+          type: integer
+        pendingApprovals:
+          type: integer
+        suspendedUsers:
+          type: integer
+        totalDepartments:
+          type: integer
+        openTasks:
+          type: integer
+        pendingAlerts:
+          type: integer
+        recentLogins:
+          type: integer
+        failedLoginsLast7Days:
+          type: integer
+      required:
+        - totalUsers
+        - activeUsers
+        - pendingApprovals
+        - suspendedUsers
+        - totalDepartments
+        - openTasks
+        - pendingAlerts
+        - recentLogins
+        - failedLoginsLast7Days
+
+    LockEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        eventType:
+          type: string
+        metadata:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - eventType
+        - createdAt
+
+    LockStatusResponse:
+      type: object
+      properties:
+        active:
+          type: boolean
+        suspendedCount:
+          type: integer
+        activeUsers:
+          type: integer
+        activeSessions:
+          type: integer
+        lastActivatedAt:
+          type: ["string", "null"]
+        recentEvents:
+          type: array
+          items:
+            $ref: "#/components/schemas/LockEvent"
+      required:
+        - active
+        - suspendedCount
+        - activeUsers
+        - activeSessions
+        - recentEvents
+
+    EmergencyLockResponse:
+      type: object
+      properties:
+        suspended:
+          type: integer
+        sessionTerminated:
+          type: integer
+        message:
+          type: string
+      required:
+        - suspended
+        - sessionTerminated
+        - message
+
+    EmergencyUnlockResponse:
+      type: object
+      properties:
+        reactivated:
+          type: integer
+        message:
+          type: string
+      required:
+        - reactivated
+        - message

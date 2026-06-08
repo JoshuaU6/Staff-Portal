@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "staff": "员工",
+    "dashboard": "仪表板",
+    "department": "我的部门",
+    "tasks": "我的任务",
+    "documents": "文件",
+    "announcements": "公告",
+    "profile": "我的资料",
+    "messages": "消息",
+    "administration": "管理",
+    "admin_overview": "管理概览",
+    "user_management": "用户管理",
+    "departments": "部门",
+    "task_management": "任务管理",
+    "audit_logs": "审计日志",
+    "active_sessions": "活跃会话",
+    "security_alerts": "安全警报",
+    "policy_compliance": "政策合规",
+    "emergency_controls": "紧急控制",
+    "back_to_website": "MTC集团网站",
+    "sign_out": "退出登录"
+  },
+  "common": {
+    "loading": "加载中...",
+    "search": "搜索",
+    "export_csv": "导出 CSV",
+    "actions": "操作",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "close": "关闭",
+    "delete": "删除",
+    "reply": "回复",
+    "send": "发送",
+    "compose": "撰写",
+    "status": {
+      "active": "活跃",
+      "pending": "待处理",
+      "suspended": "已暂停",
+      "archived": "已归档"
+    },
+    "roles": {
+      "chairman": "董事长",
+      "ict_admin": "ICT管理员",
+      "hr_admin": "人事管理员",
+      "compliance_admin": "合规管理员",
+      "auditor": "审计员",
+      "department_head": "部门主管",
+      "manager": "经理",
+      "supervisor": "主管",
+      "staff": "员工"
+    }
+  },
+  "auth": {
+    "login_title": "员工门户登录",
+    "login_subtitle": "使用您的MTC员工凭据登录",
+    "register_title": "创建员工账户",
+    "register_subtitle": "使用您的MTC员工凭据注册"
+  },
+  "messages": {
+    "title": "消息",
+    "subtitle": "内部员工通信",
+    "inbox": "收件箱",
+    "sent": "已发送",
+    "no_messages": "没有消息",
+    "nothing_sent": "尚未发送任何内容",
+    "select_message": "选择消息",
+    "select_hint": "从列表中选择消息以阅读",
+    "new_message": "新消息",
+    "subject": "主题",
+    "message": "消息内容",
+    "to": "收件人",
+    "scope": "范围",
+    "scope_individual": "个人员工",
+    "scope_all": "全体员工（广播）",
+    "sending": "发送中...",
+    "sent_ok": "消息已发送",
+    "deleted": "消息已删除"
+  },
+  "devices": {
+    "title": "可信设备",
+    "subtitle": "曾访问您账户的设备",
+    "revoke": "撤销",
+    "revoked": "已撤销",
+    "trusted_at": "信任时间",
+    "last_seen": "最后活动",
+    "no_devices": "没有可信设备"
+  }
+}

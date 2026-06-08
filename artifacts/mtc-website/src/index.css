@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+
+  --color-mtc-red: #C0001A;
+  --color-mtc-charcoal: #1A1A1A;
+  --color-mtc-charcoal-light: #2A2A2A;
+  --color-mtc-gold: #B8962E;
+  --color-mtc-grey: #F5F5F5;
+
+  --color-background: #FFFFFF;
+  --color-foreground: #1A1A1A;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1A1A1A;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1A1A1A;
+  --color-primary: #C0001A;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #F5F5F5;
+  --color-secondary-foreground: #1A1A1A;
+  --color-muted: #F5F5F5;
+  --color-muted-foreground: #666666;
+  --color-accent: #C0001A;
+  --color-accent-foreground: #FFFFFF;
+  --color-border: #E5E5E5;
+  --color-input: #E5E5E5;
+  --color-ring: #C0001A;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+  --radius: 0.25rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight text-mtc-charcoal dark:text-white;
+  }
+}
+
+/* ── Embla Carousel ─────────────────────────────────────────────── */
+.embla {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+}
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+/* ── Diagonal pattern (CTA section) ─────────────────────────────── */
+.diagonal-pattern {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 2px,
+    transparent 2px,
+    transparent 8px
+  );
+}
+
+/* ── Hero animated diagonal red line ────────────────────────────── */
+@keyframes hero-line-sweep {
+  0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(220%) skewX(-20deg); opacity: 0; }
+}
+
+@keyframes hero-pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.hero-diagonal-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(192, 0, 26, 0.55) 30%,
+    rgba(192, 0, 26, 0.55) 70%,
+    transparent 100%
+  );
+  animation: hero-line-sweep 12s ease-in-out infinite;
+}
+
+.hero-diagonal-line-2 {
+  animation-delay: 6s;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(192, 0, 26, 0.35) 30%,
+    rgba(192, 0, 26, 0.35) 70%,
+    transparent 100%
+  );
+}
+
+/* ── Scroll reveal ──────────────────────────────────────────────── */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(44px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* staggered delay helpers */
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+.reveal-delay-400 { transition-delay: 400ms; }
+
+/* ── Sector card hover overlay ──────────────────────────────────── */
+.sector-card:hover .sector-hover-overlay {
+  opacity: 0.95 !important;
+}
+
+/* ── Focus-visible ring for keyboard nav ────────────────────────── */
+:focus-visible {
+  outline: 2px solid #C0001A;
+  outline-offset: 3px;
+}

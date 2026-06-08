@@ -1,0 +1,57 @@
+{
+  "topbar": {
+    "headquarters": "المقر الرئيسي: واشنطن العاصمة، الولايات المتحدة",
+    "phone": "الخط الدولي: +1 771 240 1273",
+    "sustainability": "الاستدامة",
+    "news": "الأخبار",
+    "careers": "الوظائف",
+    "staff_portal": "بوابة الموظفين"
+  },
+  "nav": {
+    "about": "من نحن",
+    "sectors": "القطاعات",
+    "view_all_sectors": "عرض جميع القطاعات →",
+    "subsidiaries": "الشركات التابعة",
+    "leadership": "القيادة",
+    "chairman": "رئيس مجلس الإدارة",
+    "sustainability": "الاستدامة",
+    "news": "الأخبار",
+    "careers": "الوظائف",
+    "contact": "اتصل بنا",
+    "partner_with_us": "كن شريكًا معنا",
+    "home": "الرئيسية",
+    "global_presence": "الحضور العالمي"
+  },
+  "sectors": {
+    "energy": "الطاقة والبترول",
+    "trading": "التداول والسلع",
+    "agriculture": "الزراعة والمنتجات الاستهلاكية",
+    "infrastructure": "البنية التحتية",
+    "real_estate": "العقارات",
+    "healthcare": "الرعاية الصحية",
+    "education": "التعليم",
+    "technology": "التكنولوجيا"
+  },
+  "footer": {
+    "company": "الشركة",
+    "our_sectors": "قطاعاتنا",
+    "our_companies": "شركاتنا",
+    "offices": "المكاتب",
+    "get_in_touch": "تواصل معنا",
+    "about": "عن مجموعة MTC",
+    "leadership": "القيادة",
+    "subsidiaries": "الشركات التابعة",
+    "global_presence": "الحضور العالمي",
+    "sustainability": "الاستدامة",
+    "news": "الأخبار والتحليلات",
+    "careers": "الوظائف",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الاستخدام",
+    "cookies": "سياسة ملفات تعريف الارتباط",
+    "esg": "تقرير ESG",
+    "copyright": "مجموعة MTC للشركات. جميع الحقوق محفوظة.",
+    "tagline": "مجموعة عالمية للطاقة والاستثمار تعمل في أفريقيا والشرق الأوسط وأوروبا وآسيا.",
+    "contact_us": "اتصل بنا"
+  },
+  "language": "اللغة"
+}

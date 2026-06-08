@@ -1,0 +1,57 @@
+{
+  "topbar": {
+    "headquarters": "Siège : Washington DC, USA",
+    "phone": "Mondial : +1 771 240 1273",
+    "sustainability": "Durabilité",
+    "news": "Actualités",
+    "careers": "Carrières",
+    "staff_portal": "Portail du personnel"
+  },
+  "nav": {
+    "about": "À propos",
+    "sectors": "Secteurs",
+    "view_all_sectors": "Voir tous les secteurs →",
+    "subsidiaries": "Filiales",
+    "leadership": "Direction",
+    "chairman": "Président",
+    "sustainability": "Durabilité",
+    "news": "Actualités",
+    "careers": "Carrières",
+    "contact": "Contact",
+    "partner_with_us": "Devenir partenaire",
+    "home": "Accueil",
+    "global_presence": "Présence mondiale"
+  },
+  "sectors": {
+    "energy": "Énergie & Pétrole",
+    "trading": "Commerce & Matières premières",
+    "agriculture": "Agriculture & Biens de consommation",
+    "infrastructure": "Infrastructure",
+    "real_estate": "Immobilier",
+    "healthcare": "Santé",
+    "education": "Éducation",
+    "technology": "Technologie"
+  },
+  "footer": {
+    "company": "Entreprise",
+    "our_sectors": "Nos secteurs",
+    "our_companies": "Nos sociétés",
+    "offices": "Bureaux",
+    "get_in_touch": "Nous contacter",
+    "about": "À propos de MTC Group",
+    "leadership": "Direction",
+    "subsidiaries": "Filiales",
+    "global_presence": "Présence mondiale",
+    "sustainability": "Durabilité",
+    "news": "Actualités & Perspectives",
+    "careers": "Carrières",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "cookies": "Politique des cookies",
+    "esg": "Rapport ESG",
+    "copyright": "MTC Group of Companies. Tous droits réservés. Enregistré : Washington D.C., USA.",
+    "tagline": "Un groupe mondial d'énergie et d'investissement opérant en Afrique, au Moyen-Orient, en Europe et en Asie.",
+    "contact_us": "Nous contacter"
+  },
+  "language": "Langue"
+}

@@ -1,0 +1,57 @@
+{
+  "topbar": {
+    "headquarters": "总部：美国华盛顿特区",
+    "phone": "全球热线：+1 771 240 1273",
+    "sustainability": "可持续发展",
+    "news": "新闻",
+    "careers": "职业机会",
+    "staff_portal": "员工门户"
+  },
+  "nav": {
+    "about": "关于我们",
+    "sectors": "业务板块",
+    "view_all_sectors": "查看所有板块 →",
+    "subsidiaries": "子公司",
+    "leadership": "领导层",
+    "chairman": "董事长致辞",
+    "sustainability": "可持续发展",
+    "news": "新闻资讯",
+    "careers": "职业机会",
+    "contact": "联系我们",
+    "partner_with_us": "合作洽谈",
+    "home": "首页",
+    "global_presence": "全球布局"
+  },
+  "sectors": {
+    "energy": "能源与石油",
+    "trading": "贸易与大宗商品",
+    "agriculture": "农业与消费品",
+    "infrastructure": "基础设施",
+    "real_estate": "房地产",
+    "healthcare": "医疗健康",
+    "education": "教育",
+    "technology": "科技"
+  },
+  "footer": {
+    "company": "公司",
+    "our_sectors": "我们的业务板块",
+    "our_companies": "我们的公司",
+    "offices": "办事处",
+    "get_in_touch": "联系方式",
+    "about": "关于MTC集团",
+    "leadership": "领导层",
+    "subsidiaries": "子公司",
+    "global_presence": "全球布局",
+    "sustainability": "可持续发展",
+    "news": "新闻与洞察",
+    "careers": "职业机会",
+    "privacy": "隐私政策",
+    "terms": "使用条款",
+    "cookies": "Cookie政策",
+    "esg": "ESG报告",
+    "copyright": "MTC集团公司。保留所有权利。注册地：美国华盛顿特区。",
+    "tagline": "一家在非洲、中东、欧洲和亚洲运营的全球能源和投资集团。",
+    "contact_us": "联系我们"
+  },
+  "language": "语言"
+}

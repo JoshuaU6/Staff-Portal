@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "staff": "الموظفون",
+    "dashboard": "لوحة التحكم",
+    "department": "قسمي",
+    "tasks": "مهامي",
+    "documents": "المستندات",
+    "announcements": "الإعلانات",
+    "profile": "ملفي الشخصي",
+    "messages": "الرسائل",
+    "administration": "الإدارة",
+    "admin_overview": "نظرة عامة",
+    "user_management": "إدارة المستخدمين",
+    "departments": "الأقسام",
+    "task_management": "إدارة المهام",
+    "audit_logs": "سجلات المراجعة",
+    "active_sessions": "الجلسات النشطة",
+    "security_alerts": "تنبيهات الأمان",
+    "policy_compliance": "الامتثال للسياسة",
+    "emergency_controls": "ضوابط الطوارئ",
+    "back_to_website": "موقع مجموعة MTC",
+    "sign_out": "تسجيل الخروج"
+  },
+  "common": {
+    "loading": "جار التحميل...",
+    "search": "بحث",
+    "export_csv": "تصدير CSV",
+    "actions": "إجراءات",
+    "confirm": "تأكيد",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "close": "إغلاق",
+    "delete": "حذف",
+    "reply": "رد",
+    "send": "إرسال",
+    "compose": "إنشاء",
+    "status": {
+      "active": "نشط",
+      "pending": "قيد الانتظار",
+      "suspended": "موقوف",
+      "archived": "مؤرشف"
+    },
+    "roles": {
+      "chairman": "الرئيس",
+      "ict_admin": "مدير تقنية المعلومات",
+      "hr_admin": "مدير الموارد البشرية",
+      "compliance_admin": "مدير الامتثال",
+      "auditor": "مراجع",
+      "department_head": "رئيس القسم",
+      "manager": "مدير",
+      "supervisor": "مشرف",
+      "staff": "موظف"
+    }
+  },
+  "auth": {
+    "login_title": "تسجيل دخول الموظفين",
+    "login_subtitle": "سجّل الدخول ببيانات اعتماد MTC الخاصة بك",
+    "register_title": "إنشاء حساب موظف",
+    "register_subtitle": "سجّل ببيانات اعتماد MTC الخاصة بك"
+  },
+  "messages": {
+    "title": "الرسائل",
+    "subtitle": "التواصل الداخلي بين الموظفين",
+    "inbox": "صندوق الوارد",
+    "sent": "المرسلة",
+    "no_messages": "لا توجد رسائل",
+    "nothing_sent": "لم يتم الإرسال بعد",
+    "select_message": "اختر رسالة",
+    "select_hint": "اختر رسالة من القائمة لقراءتها",
+    "new_message": "رسالة جديدة",
+    "subject": "الموضوع",
+    "message": "الرسالة",
+    "to": "إلى",
+    "scope": "النطاق",
+    "scope_individual": "موظف فردي",
+    "scope_all": "جميع الموظفين",
+    "sending": "جار الإرسال...",
+    "sent_ok": "تم إرسال الرسالة",
+    "deleted": "تم حذف الرسالة"
+  },
+  "devices": {
+    "title": "الأجهزة الموثوقة",
+    "subtitle": "الأجهزة التي وصلت إلى حسابك",
+    "revoke": "إلغاء",
+    "revoked": "ملغى",
+    "trusted_at": "موثوق منذ",
+    "last_seen": "آخر ظهور",
+    "no_devices": "لا توجد أجهزة موثوقة"
+  }
+}
