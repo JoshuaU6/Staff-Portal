@@ -4,7 +4,13 @@ import { db, usersTable, loginHistoryTable, securityAlertsTable, eq, and, gte, s
 
 const router = Router();
 
-const SHARED_PASSWORD = "MTC@Portal2025!";
+const SHARED_PASSWORD = (() => {
+  if (process.env.SHARED_LOGIN_PASSWORD) return process.env.SHARED_LOGIN_PASSWORD;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SHARED_LOGIN_PASSWORD must be set in production");
+  }
+  return "changeme";
+})();
 
 /**
  * Check whether an open auto-alert whose eventRef starts with the given prefix

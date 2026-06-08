@@ -21,6 +21,8 @@ type BootstrapStatus = { needed: boolean; partial: boolean; nullCount: number } 
 export default function SetupPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const sharedLoginPassword = import.meta.env.VITE_SHARED_LOGIN_PASSWORD;
+  const passwordDisplay = sharedLoginPassword ?? "Configured shared password";
 
   const [bootstrapStatus, setBootstrapStatus] = useState<BootstrapStatus>(null);
   const [loading, setLoading] = useState(false);
@@ -398,7 +400,7 @@ export default function SetupPage() {
 
                 <div className={`rounded-lg border p-4 space-y-2.5 ${isDark ? "bg-white/3 border-white/10" : "bg-muted/30 border-border"}`}>
                   <p className={`text-xs font-medium ${isDark ? "text-white/60" : "text-foreground"}`}>
-                    Password: <code className="font-mono">MTC@Portal2025!</code>
+                    Password: <code className="font-mono">{passwordDisplay}</code>
                   </p>
                   <p className={`text-xs ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
                     All accounts use this shared password. If login is broken, use the button below

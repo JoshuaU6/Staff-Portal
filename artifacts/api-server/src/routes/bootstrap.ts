@@ -5,6 +5,14 @@ import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
+const SHARED_LOGIN_PASSWORD = (() => {
+  if (process.env.SHARED_LOGIN_PASSWORD) return process.env.SHARED_LOGIN_PASSWORD;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SHARED_LOGIN_PASSWORD must be set in production");
+  }
+  return "changeme";
+})();
+
 const DEMO_ACCOUNTS = [
   { staffId: "MTC-CHAIR-001", email: "chairman@mtc-groups.com",   fullName: "A.S. Abba",          firstName: "A.S.",        lastName: "Abba",          role: "chairman"         },
   { staffId: "MTC-ICT-001",   email: "ict@mtc-groups.com",        fullName: "ICT Administrator",  firstName: "ICT",         lastName: "Administrator", role: "ict_admin"        },
@@ -40,7 +48,7 @@ router.get("/bootstrap", async (_req: Request, res: Response): Promise<void> => 
 /**
  * Get or create a Clerk account for an email address.
  * Always creates with a shared password — the Clerk instance requires one.
- * Users log in at /portal/login with: email address + shared password MTC@Portal2025!
+ * The shared password is configured by SHARED_LOGIN_PASSWORD at runtime.
  */
 async function getOrCreateClerkUser(
   email: string,
@@ -55,7 +63,7 @@ async function getOrCreateClerkUser(
       emailAddress: [email],
       firstName,
       lastName,
-      password: "MTC@Portal2025!",
+      password: SHARED_LOGIN_PASSWORD,
       skipPasswordChecks: true,
     });
     clerkId = created.id;
