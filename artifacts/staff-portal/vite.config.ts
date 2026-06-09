@@ -10,11 +10,12 @@ export default defineConfig({
     tailwindcss({ optimize: false }),
   ],
   resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
-    },
-    dedupe: ["react", "react-dom", "@tanstack/react-query"],
+  alias: {
+    "@": path.resolve(import.meta.dirname, "src"),
+    "@hookform/resolvers/zod": path.resolve(import.meta.dirname, "node_modules/@hookform/resolvers/zod"),
   },
+  dedupe: ["react", "react-dom", "@tanstack/react-query"],
+},
   root: path.resolve(import.meta.dirname),
   define: {
     "import.meta.env.VITE_CLERK_PUBLISHABLE_KEY": JSON.stringify(
