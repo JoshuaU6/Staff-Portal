@@ -4,7 +4,6 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "customConditions": ["workspace"],
     "noEmitOnError": false,
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
