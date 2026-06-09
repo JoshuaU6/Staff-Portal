@@ -4,6 +4,7 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
+    "customConditions": ["workspace"],
     "noEmitOnError": false,
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
@@ -24,14 +25,10 @@
     "jsx": "preserve",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
-    "customConditions": ["workspace"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
-  "references": [
-    { "path": "../../lib/api-client-react" }
-  ]
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"]
 }
