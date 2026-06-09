@@ -21,11 +21,11 @@ ARG VITE_CLERK_PUBLISHABLE_KEY
 ARG CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
 
 # Vite build — produces dist/public/
+# Vite build — produces dist/public/
 RUN PORT=3000 BASE_PATH=/portal/ \
-    VITE_CLERK_PUBLISHABLE_KEY="${VITE_CLERK_PUBLISHABLE_KEY}" \
-    CLERK_PUBLISHABLE_KEY="${CLERK_PUBLISHABLE_KEY}" \
+    VITE_CLERK_PUBLISHABLE_KEY="pk_test_bmVhcmJ5LXJpbmd0YWlsLTU5LmNsZXJrLmFjY291bnRzLmRldiQ" \
+    CLERK_PUBLISHABLE_KEY="pk_test_bmVhcmJ5LXJpbmd0YWlsLTU5LmNsZXJrLmFjY291bnRzLmRldiQ" \
     npm run build -w @workspace/staff-portal
-
 # ── Stage 2: Static serve via nginx ──────────────────────────────────────────
 FROM nginx:1.27-alpine AS runtime
 
