@@ -179,12 +179,16 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
-function ClerkTokenSync() {
+function ClerkTokenSync({ onReady }: { onReady: () => void }) {
   const { getToken } = useClerk();
   useEffect(() => {
-    setAuthTokenGetter(() => getToken());
+    setAuthTokenGetter(async () => {
+      const token = await getToken();
+      return token;
+    });
+    onReady();
     return () => setAuthTokenGetter(null);
-  }, [getToken]);
+  }, [getToken, onReady]);
   return null;
 }
 
@@ -627,6 +631,7 @@ function AppRouter() {
 }
 
 function App() {
+  const [tokenReady, setTokenReady] = useState(false);
   return (
     <ThemeProvider>
       <ClerkProvider
@@ -638,8 +643,8 @@ function App() {
           <TooltipProvider>
             <WouterRouter base={basePath}>
               <ClerkQueryClientCacheInvalidator />
-              <ClerkTokenSync />
-              <AppRouter />
+              <ClerkTokenSync onReady={() => setTokenReady(true)} />
+              {tokenReady && <AppRouter />}
             </WouterRouter>
             <Toaster />
           </TooltipProvider>
