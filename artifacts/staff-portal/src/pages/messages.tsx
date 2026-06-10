@@ -30,13 +30,13 @@ interface StaffUser {
 }
 
 async function fetchMessages(box: "inbox" | "sent"): Promise<MessageItem[]> {
-  const res = await fetch(`/api/messages?box=${box}`, { credentials: "include" });
+  const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/messages?box=${box}`, { credentials: "include" });
   if (!res.ok) return [];
   return res.json();
 }
 
 async function sendMessage(payload: { toUserId?: number; subject: string; body: string; scope: string }) {
-  const res = await fetch(`/api/messages`, {
+  const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/messages`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -47,15 +47,15 @@ async function sendMessage(payload: { toUserId?: number; subject: string; body: 
 }
 
 async function markRead(id: number) {
-  await fetch(`/api/messages/${id}/read`, { method: "PATCH", credentials: "include" });
+  await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/messages/${id}/read`, { method: "PATCH", credentials: "include" });
 }
 
 async function deleteMessage(id: number) {
-  await fetch(`/api/messages/${id}`, { method: "DELETE", credentials: "include" });
+  await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/messages/${id}`, { method: "DELETE", credentials: "include" });
 }
 
 async function fetchStaff(): Promise<StaffUser[]> {
-  const res = await fetch(`/api/users`, { credentials: "include" });
+  const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/users`, { credentials: "include" });
   if (!res.ok) return [];
   return res.json();
 }

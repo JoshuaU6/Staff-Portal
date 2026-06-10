@@ -123,7 +123,7 @@ export default function AdminDocumentsPage() {
       formData.append("sensitivity", form.sensitivity);
       if (form.departmentId) formData.append("departmentId", form.departmentId);
 
-      const res = await fetch("/api/documents/upload", {
+      const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/documents/upload`, {
         method: "POST",
         body: formData,
         credentials: "include",

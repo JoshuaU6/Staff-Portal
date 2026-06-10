@@ -47,7 +47,7 @@ export default function DocumentsPage() {
 
     setDownloading(docId);
     try {
-      const res = await fetch(`/api/documents/${docId}/download`, { credentials: "include" });
+      const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/documents/${docId}/download`, { credentials: "include" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         toast({ title: "Access denied", description: body.error ?? "You do not have permission to access this document.", variant: "destructive" });
