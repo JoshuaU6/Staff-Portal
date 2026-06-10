@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import Sidebar from "./Sidebar";
 import { Bell, Menu, Lock, X } from "lucide-react";
 import {
@@ -130,7 +131,12 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {isAdmin && openAlertCount > 0 && (
-              <div className="relative" data-testid="alert-badge">
+              <div
+                className="relative cursor-pointer"
+                data-testid="alert-badge"
+                onClick={() => window.location.href = "/admin/alerts"}
+                title="View security alerts"
+              >
                 <Bell className="h-4 w-4 text-primary" />
                 <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
                   {openAlertCount > 9 ? "9+" : openAlertCount}
