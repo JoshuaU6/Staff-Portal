@@ -42,7 +42,7 @@ import {
   type PolicyWithAck,
   ApiError,
 } from "@workspace/api-client-react";
-import { setBaseUrl } from "@workspace/api-client-react";
+import { setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
 
 const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined);
 if (apiBase) setBaseUrl(apiBase);
@@ -176,6 +176,15 @@ function ClerkQueryClientCacheInvalidator() {
     return unsubscribe;
   }, [addListener, qc]);
 
+  return null;
+}
+
+function ClerkTokenSync() {
+  const { getToken } = useClerk();
+  useEffect(() => {
+    setAuthTokenGetter(() => getToken());
+    return () => setAuthTokenGetter(null);
+  }, [getToken]);
   return null;
 }
 
@@ -605,6 +614,7 @@ function App() {
           <TooltipProvider>
             <WouterRouter base={basePath}>
               <ClerkQueryClientCacheInvalidator />
+              <ClerkTokenSync />
               <AppRouter />
             </WouterRouter>
             <Toaster />

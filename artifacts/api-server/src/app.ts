@@ -35,7 +35,14 @@ app.use(
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({
+  credentials: true,
+  origin: [
+    "https://mtc-staff-portal.onrender.com",
+    "http://localhost:3000",
+    /\.onrender\.com$/,
+  ],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -45,6 +52,11 @@ app.use(
       getClerkProxyHost(req) ?? "",
       process.env.CLERK_PUBLISHABLE_KEY,
     ),
+    // Accept Bearer tokens from cross-origin frontends in addition to cookies
+    authorizedParties: [
+      "https://mtc-staff-portal.onrender.com",
+      "http://localhost:3000",
+    ],
   })),
 );
 
