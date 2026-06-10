@@ -47,6 +47,14 @@ import { setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
 const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined);
 if (apiBase) setBaseUrl(apiBase);
 
+// Register token getter immediately — reads from window.__clerk once Clerk loads
+setAuthTokenGetter(async () => {
+  if (typeof window !== "undefined" && (window as any).__clerk?.session) {
+    return (window as any).__clerk.session.getToken();
+  }
+  return null;
+});
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -179,18 +187,7 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
-function ClerkTokenSync({ onReady }: { onReady: () => void }) {
-  const { getToken } = useClerk();
-  useEffect(() => {
-    setAuthTokenGetter(async () => {
-      const token = await getToken();
-      return token;
-    });
-    onReady();
-    return () => setAuthTokenGetter(null);
-  }, [getToken, onReady]);
-  return null;
-}
+
 
 function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
@@ -631,7 +628,6 @@ function AppRouter() {
 }
 
 function App() {
-  const [tokenReady, setTokenReady] = useState(false);
   return (
     <ThemeProvider>
       <ClerkProvider
@@ -643,8 +639,7 @@ function App() {
           <TooltipProvider>
             <WouterRouter base={basePath}>
               <ClerkQueryClientCacheInvalidator />
-              <ClerkTokenSync onReady={() => setTokenReady(true)} />
-              {tokenReady && <AppRouter />}
+              <AppRouter />
             </WouterRouter>
             <Toaster />
           </TooltipProvider>
