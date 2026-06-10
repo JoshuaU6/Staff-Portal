@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
-  base: process.env.BASE_PATH ?? "/portal/",
+  base: "/",
   plugins: [
     react({
       // Disable tsconfig path resolution to avoid build issues
