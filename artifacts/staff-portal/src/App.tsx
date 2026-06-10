@@ -42,6 +42,10 @@ import {
   type PolicyWithAck,
   ApiError,
 } from "@workspace/api-client-react";
+import { setBaseUrl } from "@workspace/api-client-react";
+
+const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined);
+if (apiBase) setBaseUrl(apiBase);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -267,7 +271,8 @@ function LoginForm() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/auth/login-ticket", {
+      const apiUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
+      const res = await fetch(`${apiUrl}/api/auth/login-ticket`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -472,7 +477,7 @@ function AppRouter() {
   const { data: bootstrapStatus } = useQuery({
     queryKey: ["bootstrap-status"],
     queryFn: () =>
-      fetch("/api/bootstrap", { credentials: "include" })
+      fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap`, { credentials: "include" })
         .then((r) => r.json() as Promise<{ needed: boolean; partial: boolean; nullCount: number }>),
     enabled: isLoaded,
     staleTime: Infinity,
