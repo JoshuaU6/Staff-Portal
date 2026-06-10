@@ -31,7 +31,7 @@ export default function SetupPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/bootstrap", { credentials: "include" })
+    fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap`, { credentials: "include" })
       .then((r) => r.json())
       .then(setBootstrapStatus)
       .catch(() => setBootstrapStatus({ needed: true, partial: false, nullCount: 0 }));
@@ -41,7 +41,7 @@ export default function SetupPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/bootstrap", {
+      const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -64,7 +64,7 @@ export default function SetupPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/bootstrap/resync", {
+      const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap/resync`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -92,7 +92,7 @@ export default function SetupPage() {
     setLoading(true);
     try {
       // Step 1: delete existing Clerk accounts and clear clerkUserId in DB
-      const resetRes = await fetch("/api/bootstrap/reset-clerk", {
+      const resetRes = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap/reset-clerk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -105,7 +105,7 @@ export default function SetupPage() {
       }
 
       // Step 2: immediately recreate accounts (now without passwords in dev)
-      const resyncRes = await fetch("/api/bootstrap/resync", {
+      const resyncRes = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap/resync`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
