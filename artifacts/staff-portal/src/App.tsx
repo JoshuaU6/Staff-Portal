@@ -189,11 +189,14 @@ function ClerkTokenSync() {
 }
 
 function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const qc = useQueryClient();
+  const [retryCount, setRetryCount] = useState(0);
   const { data: policy, isLoading, isError, error } = useGetCurrentPolicy({
     query: {
       queryKey: getGetCurrentPolicyQueryKey(),
-      retry: false,
+      retry: 1,
     },
   });
   const acknowledge = useAcknowledgePolicy();
@@ -206,20 +209,38 @@ function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
 
   // 404 means no policy has been published yet — let everyone through (admins need
   // access to /admin/policy to publish the first version; staff need no gate).
-  const isNoPolicyError = error instanceof ApiError && (error as ApiError).status === 404;
+  const isNoPolicyError = error instanceof ApiError && ((error as ApiError).status === 404 || (error as ApiError).status === 401 || (error as ApiError).status >= 500);
 
   if (isError && !isNoPolicyError) {
+    const handleRetry = () => {
+      setRetryCount(c => c + 1);
+      qc.invalidateQueries({ queryKey: getGetCurrentPolicyQueryKey() });
+    };
+
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-3 max-w-sm">
-          <p className="text-sm font-medium text-foreground">Unable to load policy</p>
-          <p className="text-xs text-muted-foreground">Portal access requires policy status confirmation. Please refresh.</p>
-          <button
-            className="text-xs underline text-muted-foreground"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </button>
+      <div className={`min-h-screen ${isDark ? "bg-[#0d0d0d]" : "bg-background"} flex items-center justify-center`}>
+        <div className={`text-center space-y-3 max-w-sm p-4 border rounded-lg ${isDark ? "bg-[#1a1a1a] border-white/10" : "bg-card border-border"}`}>
+          <p className={`text-sm font-medium ${isDark ? "text-white" : "text-foreground"}`}>Unable to load policy</p>
+          <p className={`text-xs ${isDark ? "text-white/60" : "text-muted-foreground"}`}>
+            {error instanceof ApiError ? `Server error: ${error.status} ${error.statusText}` : "Network error while fetching policy status."}
+          </p>
+          <p className={`text-xs ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+            Try clicking retry below or <a href="/portal/login" className="text-[#C0001A] hover:underline">return to login</a>.
+          </p>
+          <div className="flex gap-2 justify-center pt-2">
+            <button
+              className={`text-xs px-3 py-1.5 rounded border transition-colors ${isDark ? "border-white/20 text-white/70 hover:bg-white/5" : "border-border text-muted-foreground hover:bg-muted/50"}`}
+              onClick={handleRetry}
+            >
+              Retry
+            </button>
+            <button
+              className="text-xs px-3 py-1.5 rounded bg-[#C0001A] hover:bg-[#a0001a] text-white transition-colors"
+              onClick={() => window.location.href = "/portal/login"}
+            >
+              Back to Login
+            </button>
+          </div>
         </div>
       </div>
     );
