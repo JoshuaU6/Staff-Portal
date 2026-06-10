@@ -59,7 +59,7 @@ export class ObjectStorageService {
     // Fall back to local filesystem when S3_DOCUMENTS_BUCKET is not configured
     // (useful for local dev without an AWS account).
     this.useLocal = !process.env.S3_DOCUMENTS_BUCKET;
-    this.localDir = path.resolve(process.cwd(), "uploads");
+    this.localDir = path.resolve("/tmp", "uploads");
     if (this.useLocal) {
       mkdirSync(this.localDir, { recursive: true });
     }
