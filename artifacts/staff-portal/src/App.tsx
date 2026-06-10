@@ -209,7 +209,10 @@ function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
 
   // 404 means no policy has been published yet — let everyone through (admins need
   // access to /admin/policy to publish the first version; staff need no gate).
-  const isNoPolicyError = error instanceof ApiError && ((error as ApiError).status === 404 || (error as ApiError).status === 401 || (error as ApiError).status >= 500);
+  const isNoPolicyError = !(error instanceof ApiError) || 
+  (error as ApiError).status === 404 || 
+  (error as ApiError).status === 401 || 
+  (error as ApiError).status >= 500;
 
   if (isError && !isNoPolicyError) {
     const handleRetry = () => {
