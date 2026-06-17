@@ -35,13 +35,22 @@ app.use(
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
+// Build allowed origins from env var + defaults
+const allowedOrigins = [
+  "https://mtc-staff-portal.onrender.com",
+  "https://delightful-contentment-production-6741.up.railway.app",
+  "http://localhost:3000",
+  /\.onrender\.com$/,
+  /\.railway\.app$/,
+];
+
+if (process.env.ALLOWED_ORIGINS) {
+  process.env.ALLOWED_ORIGINS.split(",").forEach((o) => allowedOrigins.push(o.trim()));
+}
+
 app.use(cors({
   credentials: true,
-  origin: [
-    "https://mtc-staff-portal.onrender.com",
-    "http://localhost:3000",
-    /\.onrender\.com$/,
-  ],
+  origin: allowedOrigins,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
