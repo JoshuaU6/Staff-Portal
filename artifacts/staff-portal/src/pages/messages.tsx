@@ -115,6 +115,10 @@ export default function MessagesPage() {
       toast({ title: "Subject and message are required", variant: "destructive" });
       return;
     }
+    if (composeData.scope === "personal" && !composeData.toUserId) {
+      toast({ title: "Please select a recipient", variant: "destructive" });
+      return;
+    }
     setSending(true);
     try {
       await sendMessage({
@@ -260,21 +264,19 @@ export default function MessagesPage() {
                   </button>
                 </div>
                 <div className="flex-1 p-5 space-y-4 overflow-y-auto">
-                  {isAdmin && (
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Scope</label>
-                      <select
-                        value={composeData.scope}
-                        onChange={(e) => setComposeData((d) => ({ ...d, scope: e.target.value, toUserId: e.target.value !== "personal" ? "" : d.toUserId }))}
-                        className="w-full border border-border rounded-sm px-3 py-2 text-sm bg-background text-foreground"
-                        data-testid="compose-scope"
-                      >
-                        <option value="personal">Individual staff member</option>
-                        <option value="all">All staff (broadcast)</option>
-                      </select>
-                    </div>
-                  )}
-                  {(!isAdmin || composeData.scope === "personal") && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Scope</label>
+                    <select
+                      value={composeData.scope}
+                      onChange={(e) => setComposeData((d) => ({ ...d, scope: e.target.value, toUserId: e.target.value !== "personal" ? "" : d.toUserId }))}
+                      className="w-full border border-border rounded-sm px-3 py-2 text-sm bg-background text-foreground"
+                      data-testid="compose-scope"
+                    >
+                      <option value="personal">Individual staff member</option>
+                      {isAdmin && <option value="all">All staff (broadcast)</option>}
+                    </select>
+                  </div>
+                  {composeData.scope === "personal" && (
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">To</label>
                       <select
@@ -284,7 +286,7 @@ export default function MessagesPage() {
                         data-testid="compose-recipient"
                       >
                         <option value="">Select recipient...</option>
-                        {staff.map((u) => (
+                        {staff.map((u: any) => (
                           <option key={u.id} value={u.id}>{u.fullName || u.email} — {ROLE_LABELS[u.role] ?? u.role}</option>
                         ))}
                       </select>
