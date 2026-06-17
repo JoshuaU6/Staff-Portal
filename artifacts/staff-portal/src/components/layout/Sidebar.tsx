@@ -27,7 +27,7 @@ import {
 import { useClerk, useUser } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import i18n, { LANGUAGES } from "@/i18n";
 import { useTheme } from "@/components/theme-provider";
 import {
@@ -87,12 +87,69 @@ const ADMIN_ROLES = ["chairman", "ict_admin", "hr_admin"];
 const COMPLIANCE_ADMIN_ROLES = ["compliance_admin"];
 const AUDITOR_ROLES = ["auditor"];
 
-function NavLink({ href, labelKey, icon: Icon, testId, onClose }: {
+function useUnreadMessageCount() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
+    const fetchCount = () => {
+      fetch(`${apiBase}/api/messages?box=inbox`, { credentials: "include" })
+        .then((r) => r.ok ? r.json() : [])
+        .then((msgs: Array<{ isRead: boolean }>) => {
+          setCount(msgs.filter((m) => !m.isRead).length);
+        })
+        .catch(() => {});
+    };
+    fetchCount();
+    const interval = setInterval(fetchCount, 60_000); // poll every 60s
+    return () => clearInterval(interval);
+  }, []);
+  return count;
+}
+
+function NavGroupWithMessageBadge({ label, links, testIdPrefix, onClose }: {
+  label: string;
+  links: { href: string; labelKey: string; icon: React.ElementType }[];
+  testIdPrefix: string;
+  onClose?: () => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const unread = useUnreadMessageCount();
+  return (
+    <div className="mb-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 w-full px-3 py-1 mb-0.5 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/35 hover:text-sidebar-foreground/60 transition-colors"
+        data-testid={`nav-group-${testIdPrefix}`}
+      >
+        <span className="flex-1 text-left">{label}</span>
+        <ChevronDown className={cn("h-2.5 w-2.5 transition-transform duration-200", open ? "rotate-0" : "-rotate-90")} />
+      </button>
+      {open && (
+        <div>
+          {links.map(({ href, labelKey, icon }) => (
+            <NavLink
+              key={href}
+              href={href}
+              labelKey={labelKey}
+              icon={icon}
+              testId={`nav-${href.replace(/\//g, "-").replace(/^-/, "")}`}
+              onClose={onClose}
+              badge={href === "/messages" ? unread : undefined}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NavLink({ href, labelKey, icon: Icon, testId, onClose, badge }: {
   href: string;
   labelKey: string;
   icon: React.ElementType;
   testId: string;
   onClose?: () => void;
+  badge?: number;
 }) {
   const [location] = useLocation();
   const { t } = useTranslation();
@@ -111,7 +168,13 @@ function NavLink({ href, labelKey, icon: Icon, testId, onClose }: {
     >
       <Icon className="h-3.5 w-3.5 shrink-0" />
       <span className="flex-1 truncate">{t(labelKey)}</span>
-      {active && <ChevronRight className="h-3 w-3 opacity-50 shrink-0" />}
+      {badge && badge > 0 ? (
+        <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      ) : active ? (
+        <ChevronRight className="h-3 w-3 opacity-50 shrink-0" />
+      ) : null}
     </Link>
   );
 }
@@ -190,7 +253,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 sidebar-scroll" data-testid="sidebar-nav">
-        <NavGroup
+        <NavGroupWithMessageBadge
           label={t("nav.staff")}
           links={staffLinkDefs}
           testIdPrefix="staff"

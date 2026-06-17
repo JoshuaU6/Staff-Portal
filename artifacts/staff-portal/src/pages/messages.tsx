@@ -109,7 +109,7 @@ export default function MessagesPage() {
   };
 
   const openCompose = async () => {
-    if (isAdmin && staff.length === 0) {
+    if (staff.length === 0) {
       const users = await fetchStaff();
       setStaff(users.filter((u) => u.id !== me?.id));
     }
@@ -285,21 +285,17 @@ export default function MessagesPage() {
                   {(!isAdmin || composeData.scope === "personal") && (
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">To</label>
-                      {isAdmin ? (
-                        <select
-                          value={composeData.toUserId}
-                          onChange={(e) => setComposeData((d) => ({ ...d, toUserId: e.target.value }))}
-                          className="w-full border border-border rounded-sm px-3 py-2 text-sm bg-background text-foreground"
-                          data-testid="compose-recipient"
-                        >
-                          <option value="">Select recipient...</option>
-                          {staff.map((u) => (
-                            <option key={u.id} value={u.id}>{u.fullName} — {ROLE_LABELS[u.role] ?? u.role}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <Input placeholder="Recipient staff ID or name" value={composeData.toUserId} onChange={(e) => setComposeData((d) => ({ ...d, toUserId: e.target.value }))} data-testid="compose-recipient-input" />
-                      )}
+                      <select
+                        value={composeData.toUserId}
+                        onChange={(e) => setComposeData((d) => ({ ...d, toUserId: e.target.value }))}
+                        className="w-full border border-border rounded-sm px-3 py-2 text-sm bg-background text-foreground"
+                        data-testid="compose-recipient"
+                      >
+                        <option value="">Select recipient...</option>
+                        {staff.map((u) => (
+                          <option key={u.id} value={u.id}>{u.fullName || u.email} — {ROLE_LABELS[u.role] ?? u.role}</option>
+                        ))}
+                      </select>
                     </div>
                   )}
                   <div className="space-y-1.5">
