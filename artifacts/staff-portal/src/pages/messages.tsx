@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import { useGetCurrentUser } from "@workspace/api-client-react";
+import { useGetCurrentUser, useListUsers } from "@workspace/api-client-react";
 import { Mail, Send, Inbox, Trash2, Plus, ChevronRight, X, Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,12 +54,6 @@ async function deleteMessage(id: number) {
   await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/messages/${id}`, { method: "DELETE", credentials: "include" });
 }
 
-async function fetchStaff(): Promise<StaffUser[]> {
-  const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/users`, { credentials: "include" });
-  if (!res.ok) return [];
-  return res.json();
-}
-
 const ROLE_LABELS: Record<string, string> = {
   chairman: "Chairman", ict_admin: "ICT Admin", hr_admin: "HR Admin",
   compliance_admin: "Compliance Admin", auditor: "Auditor",
@@ -68,6 +62,8 @@ const ROLE_LABELS: Record<string, string> = {
 
 export default function MessagesPage() {
   const { data: me } = useGetCurrentUser();
+  const { data: allUsers } = useListUsers();
+  const staff = (allUsers ?? []).filter((u: any) => u.id !== me?.id);
   const { toast } = useToast();
   const isAdmin = ["chairman", "ict_admin", "hr_admin"].includes(me?.role ?? "");
 
@@ -77,7 +73,7 @@ export default function MessagesPage() {
   const [selected, setSelected] = useState<MessageItem | null>(null);
   const [search, setSearch] = useState("");
   const [composing, setComposing] = useState(false);
-  const [staff, setStaff] = useState<StaffUser[]>([]);
+
   const [composeData, setComposeData] = useState({ toUserId: "", subject: "", body: "", scope: "personal" });
   const [sending, setSending] = useState(false);
 
@@ -108,11 +104,7 @@ export default function MessagesPage() {
     toast({ title: "Message deleted" });
   };
 
-  const openCompose = async () => {
-    if (staff.length === 0) {
-      const users = await fetchStaff();
-      setStaff(users.filter((u) => u.id !== me?.id));
-    }
+  const openCompose = () => {
     setSelected(null);
     setComposing(true);
     setComposeData({ toUserId: "", subject: "", body: "", scope: "personal" });
