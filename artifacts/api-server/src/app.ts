@@ -64,7 +64,11 @@ app.use(
     // Accept Bearer tokens from cross-origin frontends in addition to cookies
     authorizedParties: [
       "https://mtc-staff-portal.onrender.com",
+      "https://delightful-contentment-production-6741.up.railway.app",
       "http://localhost:3000",
+      ...(process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+        : []),
     ],
   })),
 );
