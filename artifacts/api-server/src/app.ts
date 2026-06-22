@@ -17,43 +17,33 @@ app.use(
   pinoHttp({
     logger,
     serializers: {
-      req(req) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
-      },
-      res(res) {
-        return {
-          statusCode: res.statusCode,
-        };
-      },
+      req(req) { return { id: req.id, method: req.method, url: req.url?.split("?")[0] }; },
+      res(res) { return { statusCode: res.statusCode }; },
     },
   }),
 );
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-// Build allowed origins from env var + defaults
-const allowedOrigins = [
+const allowedOrigins: (string | RegExp)[] = [
   "https://mtc-staff-portal.onrender.com",
   "https://delightful-contentment-production-6741.up.railway.app",
+  "https://portal.mtc-groups.com",
+  "https://www.mtc-groups.com",
+  "https://mtc-groups.com",
   "http://localhost:3000",
   /\.onrender\.com$/,
   /\.railway\.app$/,
+  /\.vercel\.app$/,
 ];
 
 if (process.env.ALLOWED_ORIGINS) {
   process.env.ALLOWED_ORIGINS.split(",").forEach((o) => allowedOrigins.push(o.trim()));
 }
 
-app.use(cors({
-  credentials: true,
-  origin: allowedOrigins,
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({ credentials: true, origin: allowedOrigins }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(
   clerkMiddleware((req) => ({
@@ -61,9 +51,10 @@ app.use(
       getClerkProxyHost(req) ?? "",
       process.env.CLERK_PUBLISHABLE_KEY,
     ),
-    // Accept Bearer tokens from cross-origin frontends in addition to cookies
     authorizedParties: [
       "https://portal.mtc-groups.com",
+      "https://www.mtc-groups.com",
+      "https://mtc-groups.com",
       "https://mtc-staff-portal.onrender.com",
       "https://delightful-contentment-production-6741.up.railway.app",
       "http://localhost:3000",
