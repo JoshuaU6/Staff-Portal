@@ -3,6 +3,7 @@ import { eq, desc, and } from "@workspace/db";
 import { db } from "@workspace/db";
 import { jobPostingsTable, jobApplicationsTable, usersTable } from "@workspace/db";
 import { requireAuth, requireAdmin, logAuditEvent } from "../lib/auth";
+import { sendEmail, buildApplicantConfirmationEmail, buildHRNotificationEmail } from "../lib/email";
 
 const router: IRouter = Router();
 
@@ -51,6 +52,32 @@ router.post("/public/jobs/:id/apply", async (req: Request, res: Response): Promi
     cvFileName: cvFileName || null,
     status: "new",
   }).returning();
+
+  // Send emails asynchronously — don't block the response
+  const emailData = {
+    applicantName: fullName.trim(),
+    applicantEmail: email.trim().toLowerCase(),
+    applicantPhone: phone?.trim(),
+    applicantLinkedin: linkedin?.trim(),
+    jobTitle: job.title,
+    department: job.department,
+    location: job.location,
+    coverLetter: coverLetter?.trim(),
+    applicationId: application.id,
+  };
+
+  // 1. Confirmation email to applicant
+  const confirmEmail = buildApplicantConfirmationEmail(emailData);
+  confirmEmail.to = emailData.applicantEmail;
+  sendEmail(confirmEmail).then((sent) => {
+    if (sent) console.log(`[jobs] Confirmation email sent to ${emailData.applicantEmail}`);
+  });
+
+  // 2. Notification email to HR
+  const hrEmail = buildHRNotificationEmail(emailData);
+  sendEmail(hrEmail).then((sent) => {
+    if (sent) console.log(`[jobs] HR notification sent for application ${application.id}`);
+  });
 
   res.status(201).json({ success: true, applicationId: application.id });
 });
