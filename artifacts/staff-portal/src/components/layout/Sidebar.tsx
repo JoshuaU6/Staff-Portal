@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
+  LayoutDashboard, Briefcase,
   CheckSquare,
   FileText,
   Megaphone,
@@ -59,6 +59,8 @@ const adminManagementLinks = [
   { href: "/admin/announcements", labelKey: "nav.announcements", icon: Megaphone },
   { href: "/admin/tasks", labelKey: "nav.task_management", icon: CheckSquare },
   { href: "/admin/documents", labelKey: "nav.documents", icon: FileText },
+  { href: "/admin/jobs", labelKey: "nav.job_postings", icon: Briefcase },
+  { href: "/admin/job-applications", labelKey: "nav.job_applications", icon: Users },
 ];
 
 const adminSecurityLinks = [

@@ -2,11 +2,11 @@ import { Switch, Route, Router as WouterRouter, Redirect, useLocation } from "wo
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ClerkProvider, SignIn, SignUp, useUser, ClerkLoading, ClerkLoaded, useClerk, useAuth } from "@clerk/react";
+import { ClerkProvider, SignIn, SignUp, useUser, ClerkLoading, ClerkLoaded, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useSignIn } from "@clerk/react/legacy";
 import { clerkAppearance } from "@/lib/clerk";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Globe, ChevronDown, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n, { LANGUAGES } from "@/i18n";
@@ -31,6 +31,8 @@ import AdminAlertsPage from "@/pages/admin/alerts";
 import AdminDocumentsPage from "@/pages/admin/documents";
 import AdminPolicyPage from "@/pages/admin/policy";
 import ChairmanEmergencyPage from "@/pages/chairman/emergency";
+import AdminJobsPage from "@/pages/admin/jobs";
+import AdminJobApplicationsPage from "@/pages/admin/job-applications";
 import ProfilePage from "@/pages/profile";
 import DepartmentPage from "@/pages/department";
 import { PolicyGate } from "@/components/PolicyGate";
@@ -42,10 +44,6 @@ import {
   type PolicyWithAck,
   ApiError,
 } from "@workspace/api-client-react";
-import { setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
-
-const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined);
-if (apiBase) setBaseUrl(apiBase);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,11 +56,16 @@ const queryClient = new QueryClient({
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+// REQUIRED — resolves the publishable key from the current hostname so the same
+// build serves multiple Clerk custom domains (dev FAPI vs prod proxy).
 const clerkPubKey = publishableKeyFromHost(
   window.location.hostname,
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 );
 
+// Empty in dev (Clerk hits dev FAPI directly); set VITE_CLERK_PROXY_URL in prod
+// when running behind a custom domain to enable Clerk proxy mode.
+// Do NOT gate on import.meta.env.PROD — the empty dev value is intentional.
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL as string | undefined;
 
 function PortalAuthLayout({ children, title, subtitle }: {
@@ -78,6 +81,7 @@ function PortalAuthLayout({ children, title, subtitle }: {
 
   return (
     <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#0d0d0d] text-white" : "bg-background text-foreground"}`}>
+      {/* Top-right controls: theme toggle + language selector */}
       <div className="absolute top-4 right-5 z-10 flex items-center gap-2">
         <ThemeToggle />
         <div className="relative">
@@ -108,15 +112,21 @@ function PortalAuthLayout({ children, title, subtitle }: {
         </div>
       </div>
 
+      {/* Centered auth block */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        {/* Logo */}
         <img
           src={`${import.meta.env.BASE_URL}mtc-logo.png`}
           alt="MTC Group of Companies"
           className="h-24 w-auto object-contain mb-6"
           data-testid="portal-logo"
         />
+
+        {/* Title + subtitle */}
         <h1 className={`text-2xl font-serif font-semibold tracking-tight mb-1 text-center ${isDark ? "text-white" : "text-foreground"}`}>{t(title)}</h1>
         <p className={`text-sm mb-5 text-center ${isDark ? "text-white/50" : "text-muted-foreground"}`}>{t(subtitle)}</p>
+
+        {/* Card area — skeleton shown while Clerk JS loads to prevent layout jump */}
         <div className="w-full max-w-md">
           <ClerkLoading>
             <div className="bg-card border border-border rounded-xl shadow-xl p-8 space-y-4 animate-pulse">
@@ -138,6 +148,7 @@ function PortalAuthLayout({ children, title, subtitle }: {
         </div>
       </div>
 
+      {/* Footer */}
       <div className="pb-5 text-center">
         <p className={`text-xs ${isDark ? "text-white/25" : "text-muted-foreground/40"}`}>
           &copy; {new Date().getFullYear()} MTC Group of Companies. All rights reserved.
@@ -166,32 +177,12 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
-function ClerkTokenSync() {
-  const { getToken } = useAuth();
-
-  useLayoutEffect(() => {
-    setAuthTokenGetter(async () => {
-      try {
-        return await getToken();
-      } catch {
-        return null;
-      }
-    });
-    return () => setAuthTokenGetter(null);
-  });
-
-  return null;
-}
-
 function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const qc = useQueryClient();
-  const [retryCount, setRetryCount] = useState(0);
   const { data: policy, isLoading, isError, error } = useGetCurrentPolicy({
     query: {
       queryKey: getGetCurrentPolicyQueryKey(),
-      retry: 1,
+      retry: false,
     },
   });
   const acknowledge = useAcknowledgePolicy();
@@ -202,38 +193,22 @@ function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  const isNoPolicyError = !(error instanceof ApiError) ||
-    (error as ApiError).status === 404 ||
-    (error as ApiError).status === 401 ||
-    (error as ApiError).status >= 500;
+  // 404 means no policy has been published yet — let everyone through (admins need
+  // access to /admin/policy to publish the first version; staff need no gate).
+  const isNoPolicyError = error instanceof ApiError && (error as ApiError).status === 404;
 
   if (isError && !isNoPolicyError) {
-    const handleRetry = () => {
-      setRetryCount(c => c + 1);
-      qc.invalidateQueries({ queryKey: getGetCurrentPolicyQueryKey() });
-    };
-
     return (
-      <div className={`min-h-screen ${isDark ? "bg-[#0d0d0d]" : "bg-background"} flex items-center justify-center`}>
-        <div className={`text-center space-y-3 max-w-sm p-4 border rounded-lg ${isDark ? "bg-[#1a1a1a] border-white/10" : "bg-card border-border"}`}>
-          <p className={`text-sm font-medium ${isDark ? "text-white" : "text-foreground"}`}>Unable to load policy</p>
-          <p className={`text-xs ${isDark ? "text-white/60" : "text-muted-foreground"}`}>
-            {error instanceof ApiError ? `Server error: ${error.status} ${error.statusText}` : "Network error while fetching policy status."}
-          </p>
-          <div className="flex gap-2 justify-center pt-2">
-            <button
-              className={`text-xs px-3 py-1.5 rounded border transition-colors ${isDark ? "border-white/20 text-white/70 hover:bg-white/5" : "border-border text-muted-foreground hover:bg-muted/50"}`}
-              onClick={handleRetry}
-            >
-              Retry
-            </button>
-            <button
-              className="text-xs px-3 py-1.5 rounded bg-[#C0001A] hover:bg-[#a0001a] text-white transition-colors"
-              onClick={() => window.location.href = "/login"}
-            >
-              Back to Login
-            </button>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-3 max-w-sm">
+          <p className="text-sm font-medium text-foreground">Unable to load policy</p>
+          <p className="text-xs text-muted-foreground">Portal access requires policy status confirmation. Please refresh.</p>
+          <button
+            className="text-xs underline text-muted-foreground"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -255,11 +230,27 @@ function PolicyGateWrapper({ children }: { children: React.ReactNode }) {
   return <PolicyGate policy={policy} onAcknowledge={handleAcknowledge} />;
 }
 
+/**
+ * LoginForm — two-stage: credentials → optional TOTP second factor.
+ *
+ * Stage 1 ("credentials"): email + password → POST /api/auth/login-ticket →
+ *   signIn.create({ strategy: "ticket" })
+ *   - If Clerk returns status "complete" → done, redirect.
+ *   - If Clerk returns status "needs_second_factor" → advance to Stage 2.
+ *
+ * Stage 2 ("mfa"): user enters 6-digit TOTP code →
+ *   signIn.attemptSecondFactor({ strategy: "totp", code })
+ *   - On complete → redirect to dashboard.
+ *
+ * MFA enrollment is managed in the user's Profile page via Clerk's hosted
+ * User Profile component, or by the admin in the Clerk dashboard.
+ */
 function LoginForm() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
+  // Stage: "credentials" | "mfa"
   const [stage, setStage] = useState<"credentials" | "mfa">("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -268,6 +259,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  /* ── Stage 1: credentials ──────────────────────────────────────────────── */
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded || !signIn) {
@@ -277,8 +269,7 @@ function LoginForm() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
-      const res = await fetch(`${apiUrl}/api/auth/login-ticket`, {
+      const res = await fetch("/api/auth/login-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -296,11 +287,12 @@ function LoginForm() {
         await setActive({ session: result.createdSessionId });
         window.location.replace(basePath + "/dashboard");
       } else if (result.status === "needs_second_factor") {
+        // MFA is enabled on this account — advance to TOTP stage
         setStage("mfa");
         setTotpCode("");
         setError(null);
       } else {
-        setError(`Sign-in returned status "${result.status}". Please reset accounts at /setup and try again.`);
+        setError(`Sign-in returned status "${result.status}". Please reset accounts at /portal/setup and try again.`);
       }
     } catch (err: any) {
       const msg: string = err?.errors?.[0]?.longMessage ?? err?.message ?? "An unexpected error occurred";
@@ -310,6 +302,7 @@ function LoginForm() {
     }
   };
 
+  /* ── Stage 2: TOTP second factor ───────────────────────────────────────── */
   const handleMfaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded || !signIn) return;
@@ -343,6 +336,7 @@ function LoginForm() {
   const input = `w-full h-10 px-3 rounded-lg border text-sm outline-none transition-colors focus:ring-2 focus:ring-[#C0001A]/40 ${isDark ? "bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#C0001A]/60" : "bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-[#C0001A]"}`;
   const label = `block text-xs font-medium uppercase tracking-wider mb-1.5 ${isDark ? "text-white/50" : "text-muted-foreground"}`;
 
+  /* ── MFA stage UI ──────────────────────────────────────────────────────── */
   if (stage === "mfa") {
     return (
       <div className={`rounded-xl shadow-xl border p-8 ${isDark ? "bg-[#161616] border-white/10" : "bg-card border-border"}`}>
@@ -369,6 +363,7 @@ function LoginForm() {
               required
               value={totpCode}
               onChange={(e) => {
+                // Auto-format as "123 456"
                 const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
                 setTotpCode(raw.length > 3 ? raw.slice(0, 3) + " " + raw.slice(3) : raw);
               }}
@@ -404,6 +399,7 @@ function LoginForm() {
     );
   }
 
+  /* ── Credentials stage UI ──────────────────────────────────────────────── */
   return (
     <div className={`rounded-xl shadow-xl border p-8 ${isDark ? "bg-[#161616] border-white/10" : "bg-card border-border"}`}>
       <form onSubmit={handleCredentialsSubmit} className="space-y-4">
@@ -478,7 +474,7 @@ function AppRouter() {
   const { data: bootstrapStatus } = useQuery({
     queryKey: ["bootstrap-status"],
     queryFn: () =>
-      fetch(`${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""}/api/bootstrap`, { credentials: "include" })
+      fetch("/api/bootstrap", { credentials: "include" })
         .then((r) => r.json() as Promise<{ needed: boolean; partial: boolean; nullCount: number }>),
     enabled: isLoaded,
     staleTime: Infinity,
@@ -538,15 +534,19 @@ function AppRouter() {
       <Route path="/announcements">
         <RequireAuth><AnnouncementsPage /></RequireAuth>
       </Route>
+
       <Route path="/profile">
         <RequireAuth><ProfilePage /></RequireAuth>
       </Route>
+
       <Route path="/department">
         <RequireAuth><DepartmentPage /></RequireAuth>
       </Route>
+
       <Route path="/messages">
         <RequireAuth><MessagesPage /></RequireAuth>
       </Route>
+
       <Route path="/admin">
         <RequireAuth><AdminOverviewPage /></RequireAuth>
       </Route>
@@ -580,6 +580,14 @@ function AppRouter() {
       <Route path="/admin/policy">
         <RequireAuth><AdminPolicyPage /></RequireAuth>
       </Route>
+
+      <Route path="/admin/jobs">
+        <RequireAuth><AdminJobsPage /></RequireAuth>
+      </Route>
+      <Route path="/admin/job-applications">
+        <RequireAuth><AdminJobApplicationsPage /></RequireAuth>
+      </Route>
+
       <Route path="/chairman/emergency">
         <RequireAuth><ChairmanEmergencyPage /></RequireAuth>
       </Route>
@@ -601,7 +609,6 @@ function App() {
           <TooltipProvider>
             <WouterRouter base={basePath}>
               <ClerkQueryClientCacheInvalidator />
-              <ClerkTokenSync />
               <AppRouter />
             </WouterRouter>
             <Toaster />

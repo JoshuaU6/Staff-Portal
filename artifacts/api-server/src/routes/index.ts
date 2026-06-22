@@ -16,6 +16,7 @@ import devicesRouter from "./devices";
 import messagesRouter from "./messages";
 import loginEventRouter from "./login-event";
 import chairmanRouter from "./chairman";
+import jobsRouter from "./jobs";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(devicesRouter);
 router.use(messagesRouter);
 router.use(loginEventRouter);
 router.use(chairmanRouter);
+router.use(jobsRouter);
 
 export default router;
