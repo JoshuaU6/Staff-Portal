@@ -63,11 +63,15 @@ const baseStyle = `
 `;
 
 const headerHtml = (subtitle: string) => `
-  <div style="background: #0d1117; padding: 32px 40px; border-bottom: 3px solid #C0001A;">
+  <div style="background: #0d1117; padding: 28px 40px; border-bottom: 3px solid #C0001A;">
     <div style="display: flex; align-items: center; gap: 16px;">
-      <div style="width: 48px; height: 48px; background: #C0001A; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-        <span style="color: white; font-size: 20px; font-weight: bold;">M</span>
-      </div>
+      <img
+        src="https://www.mtc-groups.com/images/mtc-logo.png"
+        alt="MTC Group of Companies"
+        width="80"
+        height="80"
+        style="width: 80px; height: 80px; object-fit: contain; display: block;"
+      />
       <div>
         <div style="color: #ffffff; font-size: 18px; font-weight: bold; letter-spacing: 0.5px;">MTC Group of Companies</div>
         <div style="color: #C0001A; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;">${subtitle}</div>
