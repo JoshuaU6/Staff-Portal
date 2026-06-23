@@ -298,12 +298,25 @@ router.patch("/job-applications/:id", requireAuth, requireAdmin, async (req: Req
 
   // Send automatic status email to candidate
   if (status && app.email) {
+    // Fetch the job posting to get the correct department and location
+    let jobDepartment = "MTC Group of Companies";
+    let jobLocation = "International";
+    if (app.jobId) {
+      const [jobRecord] = await db.select({ department: jobPostingsTable.department, location: jobPostingsTable.location })
+        .from(jobPostingsTable)
+        .where(eq(jobPostingsTable.id, app.jobId));
+      if (jobRecord) {
+        jobDepartment = jobRecord.department;
+        jobLocation = jobRecord.location;
+      }
+    }
+
     const emailData = {
       applicantName: app.fullName,
       applicantEmail: app.email,
       jobTitle: app.jobTitle,
-      department: app.division ?? "MTC Group",
-      location: app.countryOfResidence ?? "International",
+      department: jobDepartment,
+      location: jobLocation,
       applicationRef: app.applicationId ?? `MTC-APP-${String(app.id).padStart(6, "0")}`,
       assessmentDetails,
       interviewDate,
