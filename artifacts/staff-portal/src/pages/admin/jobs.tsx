@@ -3,30 +3,39 @@ import AppLayout from "@/components/layout/AppLayout";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Briefcase, MapPin, Clock, Users, Edit2, Trash2, Eye, EyeOff, X, ChevronRight } from "lucide-react";
+import { Plus, Briefcase, MapPin, Clock, Users, Edit2, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { useAuth } from "@clerk/react";
 
-const API = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
+const API = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+  ?? "https://staff-portal-production-2d9f.up.railway.app";
 
-async function apiFetch(path: string, opts?: RequestInit) {
-  const { getToken } = (window as any).__clerkGetToken ?? {};
-  const token = getToken ? await getToken() : null;
-  const res = await fetch(`${API}${path}`, {
-    ...opts,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(opts?.headers ?? {}),
-    },
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? res.statusText);
-  if (res.status === 204) return null;
-  return res.json();
+function useApiFetch() {
+  const { getToken } = useAuth();
+
+  return async function apiFetch(path: string, opts?: RequestInit) {
+    const token = await getToken().catch(() => null);
+    const res = await fetch(`${API}${path}`, {
+      ...opts,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(opts?.headers ?? {}),
+      },
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? res.statusText);
+    if (res.status === 204) return null;
+    return res.json();
+  };
 }
 
-const EMPTY_FORM = { title: "", department: "", location: "", type: "Full-time", level: "Mid-level", description: "", requirements: "" };
+const EMPTY_FORM = {
+  title: "", department: "", division: "", location: "", country: "",
+  type: "Full-time", level: "Mid-level", workMode: "On-site",
+  description: "", responsibilities: "", requirements: "", benefits: ""
+};
+
 const STATUS_COLOURS: Record<string, string> = {
   draft: "bg-yellow-500/10 text-yellow-600 border border-yellow-500/20",
   published: "bg-green-500/10 text-green-600 border border-green-500/20",
@@ -36,6 +45,7 @@ const STATUS_COLOURS: Record<string, string> = {
 export default function AdminJobsPage() {
   const qc = useQueryClient();
   const { toast } = useToast();
+  const apiFetch = useApiFetch();
   const [showForm, setShowForm] = useState(false);
   const [editJob, setEditJob] = useState<any>(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -50,7 +60,13 @@ export default function AdminJobsPage() {
   const openCreate = () => { setEditJob(null); setForm(EMPTY_FORM); setShowForm(true); };
   const openEdit = (job: any) => {
     setEditJob(job);
-    setForm({ title: job.title, department: job.department, location: job.location, type: job.type, level: job.level, description: job.description, requirements: job.requirements ?? "" });
+    setForm({
+      title: job.title, department: job.department, division: job.division ?? "",
+      location: job.location, country: job.country ?? "", type: job.type,
+      level: job.level, workMode: job.workMode ?? "On-site",
+      description: job.description, responsibilities: job.responsibilities ?? "",
+      requirements: job.requirements ?? "", benefits: job.benefits ?? "",
+    });
     setShowForm(true);
   };
 
@@ -108,7 +124,6 @@ export default function AdminJobsPage() {
           </Button>
         </div>
 
-        {/* Form modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -124,11 +139,19 @@ export default function AdminJobsPage() {
                   </div>
                   <div>
                     <label className={labelCls}>Department *</label>
-                    <Input placeholder="e.g. Energy & Trading" value={form.department} onChange={f("department")} />
+                    <Input placeholder="e.g. Oil & Gas" value={form.department} onChange={f("department")} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Division</label>
+                    <Input placeholder="e.g. Trading" value={form.division} onChange={f("division")} />
                   </div>
                   <div>
                     <label className={labelCls}>Location *</label>
-                    <Input placeholder="e.g. Lagos, Nigeria" value={form.location} onChange={f("location")} />
+                    <Input placeholder="e.g. London / Doha / Amsterdam" value={form.location} onChange={f("location")} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Country</label>
+                    <Input placeholder="e.g. UK / Qatar / Netherlands" value={form.country} onChange={f("country")} />
                   </div>
                   <div>
                     <label className={labelCls}>Type</label>
@@ -142,13 +165,27 @@ export default function AdminJobsPage() {
                       <option>Junior</option><option>Mid-level</option><option>Senior</option><option>Management</option><option>Executive</option>
                     </select>
                   </div>
+                  <div>
+                    <label className={labelCls}>Work Mode</label>
+                    <select value={form.workMode} onChange={f("workMode")} className={inputCls}>
+                      <option>On-site</option><option>Hybrid</option><option>Remote</option>
+                    </select>
+                  </div>
                   <div className="md:col-span-2">
                     <label className={labelCls}>Job Description *</label>
-                    <textarea value={form.description} onChange={f("description")} rows={5} placeholder="Describe the role, responsibilities, and what the candidate will do..." className={`${inputCls} resize-none`} />
+                    <textarea value={form.description} onChange={f("description")} rows={4} className={`${inputCls} resize-none`} placeholder="Describe the role..." />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className={labelCls}>Responsibilities</label>
+                    <textarea value={form.responsibilities} onChange={f("responsibilities")} rows={3} className={`${inputCls} resize-none`} placeholder="Key responsibilities..." />
                   </div>
                   <div className="md:col-span-2">
                     <label className={labelCls}>Requirements</label>
-                    <textarea value={form.requirements} onChange={f("requirements")} rows={4} placeholder="List qualifications, experience, skills required..." className={`${inputCls} resize-none`} />
+                    <textarea value={form.requirements} onChange={f("requirements")} rows={3} className={`${inputCls} resize-none`} placeholder="Qualifications, experience, certifications..." />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className={labelCls}>Benefits</label>
+                    <textarea value={form.benefits} onChange={f("benefits")} rows={2} className={`${inputCls} resize-none`} placeholder="Benefits offered..." />
                   </div>
                 </div>
               </div>
@@ -160,7 +197,6 @@ export default function AdminJobsPage() {
           </div>
         )}
 
-        {/* Jobs list */}
         {isLoading ? (
           <div className="py-12 text-center text-sm text-muted-foreground">Loading jobs...</div>
         ) : (jobs as any[]).length === 0 ? (
@@ -176,7 +212,8 @@ export default function AdminJobsPage() {
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className={`text-xs px-2 py-0.5 rounded font-medium ${STATUS_COLOURS[job.status]}`}>{job.status}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded font-medium ${STATUS_COLOURS[job.status] ?? ""}`}>{job.status}</span>
+                      {job.jobId && <span className="text-xs font-mono text-muted-foreground">{job.jobId}</span>}
                       <span className="text-xs text-muted-foreground">{job.department}</span>
                     </div>
                     <h3 className="text-base font-semibold text-foreground">{job.title}</h3>
@@ -198,9 +235,7 @@ export default function AdminJobsPage() {
                       </Button>
                     )}
                     {job.status === "closed" && (
-                      <Button size="sm" variant="outline" className="gap-1" onClick={() => handleStatusChange(job, "draft")}>
-                        Reopen
-                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleStatusChange(job, "draft")}>Reopen</Button>
                     )}
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => openEdit(job)}>
                       <Edit2 className="h-3.5 w-3.5" /> Edit
