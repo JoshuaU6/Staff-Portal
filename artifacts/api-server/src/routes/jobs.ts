@@ -3,7 +3,7 @@ import { eq, desc, and, ilike } from "@workspace/db";
 import { db } from "@workspace/db";
 import { jobPostingsTable, jobApplicationsTable, jobApplicationNotesTable } from "@workspace/db";
 import { requireAuth, requireAdmin, logAuditEvent } from "../lib/auth";
-import { sendEmail, buildApplicantConfirmationEmail, buildHRNotificationEmail } from "../lib/email";
+import { sendEmail, buildApplicantConfirmationEmail, buildHRNotificationEmail, buildStatusEmail } from "../lib/email";
 
 const router: IRouter = Router();
 
@@ -285,13 +285,42 @@ router.patch("/job-applications/:id", requireAuth, requireAdmin, async (req: Req
   const id = parseInt(req.params.id);
   if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
   const actor = (req as any).staffUser;
-  const { status, assignedTo } = req.body;
+  const { status, assignedTo, assessmentDetails, interviewDate, interviewTime, interviewLink,
+    offerLetterUrl, rejectionReason, rejectionNote } = req.body;
+
   const updates: any = { reviewedBy: actor.id, reviewedAt: new Date() };
   if (status) updates.status = status;
   if (assignedTo !== undefined) updates.assignedTo = assignedTo || null;
+
   const [app] = await db.update(jobApplicationsTable).set(updates).where(eq(jobApplicationsTable.id, id)).returning();
   if (!app) { res.status(404).json({ error: "Not found" }); return; }
   await logAuditEvent(actor.id, "job_application.updated", "job_application", app.id, { status: app.status });
+
+  // Send automatic status email to candidate
+  if (status && app.email) {
+    const emailData = {
+      applicantName: app.fullName,
+      applicantEmail: app.email,
+      jobTitle: app.jobTitle,
+      department: app.division ?? "MTC Group",
+      location: app.countryOfResidence ?? "International",
+      applicationRef: app.applicationId ?? `MTC-APP-${String(app.id).padStart(6, "0")}`,
+      assessmentDetails,
+      interviewDate,
+      interviewTime,
+      interviewLink,
+      offerLetterUrl,
+      rejectionReason,
+      rejectionNote,
+    };
+    const email = buildStatusEmail(status, emailData);
+    if (email) {
+      sendEmail(email).then((sent) => {
+        console.log(`[jobs] Status email (${status}) ${sent ? "sent" : "failed"} to ${app.email}`);
+      }).catch(console.error);
+    }
+  }
+
   res.json({ ...app, appliedAt: app.appliedAt.toISOString(), reviewedAt: app.reviewedAt?.toISOString() ?? null });
 });
 
