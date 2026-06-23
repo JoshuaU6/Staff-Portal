@@ -245,32 +245,32 @@ function AppDetailModal({ app, onClose, onStatusUpdate }: {
         style={{ position: "fixed", inset: 0, zIndex: 9999, backgroundColor: "rgba(0,0,0,0.6)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "2rem 1rem", overflowY: "auto" }}
         onClick={(e) => { if (e.target === e.currentTarget && !pendingStatus) onClose(); }}
       >
-        <div style={{ background: "var(--card, #fff)", border: "1px solid var(--border, #e5e7eb)", borderRadius: "12px", boxShadow: "0 25px 50px rgba(0,0,0,0.4)", width: "100%", maxWidth: "680px", margin: "auto" }}>
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px", boxShadow: "0 25px 60px rgba(0,0,0,0.5)", width: "100%", maxWidth: "680px", margin: "auto" }}>
           {/* Header */}
-          <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid var(--border, #e5e7eb)", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "flex-start", justifyContent: "space-between", background: "#ffffff", borderRadius: "12px 12px 0 0" }}>
             <div>
-              <h3 style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "16px", color: "var(--foreground, #1a1a2e)" }}>{app.fullName}</h3>
-              <p style={{ margin: "0 0 6px", fontSize: "12px", color: "var(--muted-foreground, #888)" }}>{app.applicationId} · {app.jobTitle}</p>
+              <h3 style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "16px", color: "#1a1a2e" }}>{app.fullName}</h3>
+              <p style={{ margin: "0 0 6px", fontSize: "12px", color: "#888888" }}>{app.applicationId} · {app.jobTitle}</p>
               <span style={{ display: "inline-block", background: cfg.bg, color: cfg.colour, fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", textTransform: "uppercase", letterSpacing: "1px" }}>
                 {cfg.label}
               </span>
             </div>
-            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted-foreground,#888)", padding: "4px" }}><X size={20} /></button>
+            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#888888", padding: "4px" }}><X size={20} /></button>
           </div>
 
-          <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem", background: "#ffffff" }}>
             {/* Contact */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <a href={`mailto:${app.email}`} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#C0001A", textDecoration: "none" }}>
                 <Mail size={14} />{app.email}
               </a>
-              {app.phone && <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "var(--muted-foreground,#888)" }}><Phone size={14} />{app.phone}</span>}
+              {app.phone && <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#888888" }}><Phone size={14} />{app.phone}</span>}
               {app.linkedin && <a href={app.linkedin} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#C0001A", textDecoration: "none" }}><Linkedin size={14} />LinkedIn <ExternalLink size={11} /></a>}
               {app.cvUrl && <a href={app.cvUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#C0001A", textDecoration: "none" }}><FileText size={14} />{app.cvFileName ?? "View CV"} <ExternalLink size={11} /></a>}
             </div>
 
             {/* Key details */}
-            <div style={{ background: "var(--muted,#f8f8f8)", borderRadius: "6px", padding: "12px 16px", border: "1px solid var(--border,#e5e7eb)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: "12px" }}>
+            <div style={{ background: "#f8f9fa", borderRadius: "6px", padding: "12px 16px", border: "1px solid #e5e7eb", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: "12px" }}>
               {[
                 ["Nationality", app.nationality],
                 ["Country", app.countryOfResidence],
@@ -285,15 +285,15 @@ function AppDetailModal({ app, onClose, onStatusUpdate }: {
                 ["Visa Required", app.requiresVisaSponsorship === true ? "Yes" : app.requiresVisaSponsorship === false ? "No" : null],
                 ["Talent Pool", app.addToTalentPool ? "Yes" : null],
               ].filter(([, v]) => v).map(([label, value]) => (
-                <div key={label as string}><span style={{ color: "var(--muted-foreground,#888)" }}>{label}: </span><span style={{ color: "var(--foreground,#1a1a2e)", fontWeight: 500 }}>{value as string}</span></div>
+                <div key={label as string}><span style={{ color: "#888888" }}>{label}: </span><span style={{ color: "#1a1a2e", fontWeight: 500 }}>{value as string}</span></div>
               ))}
             </div>
 
             {/* Cover letter */}
             {app.coverLetter && (
               <div>
-                <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--muted-foreground,#888)", textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 8px" }}>Cover Letter</p>
-                <div style={{ background: "var(--muted,#f8f8f8)", border: "1px solid var(--border,#e5e7eb)", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", lineHeight: 1.8, color: "var(--foreground,#333)", whiteSpace: "pre-wrap", maxHeight: "180px", overflowY: "auto" }}>
+                <p style={{ fontSize: "11px", fontWeight: 700, color: "#888888", textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 8px" }}>Cover Letter</p>
+                <div style={{ background: "#f8f9fa", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", lineHeight: "1.8", color: "#333333", whiteSpace: "pre-wrap", maxHeight: "180px", overflowY: "auto" }}>
                   {app.coverLetter}
                 </div>
               </div>
@@ -301,7 +301,7 @@ function AppDetailModal({ app, onClose, onStatusUpdate }: {
 
             {/* Status update */}
             <div>
-              <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--muted-foreground,#888)", textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 10px" }}>
+              <p style={{ fontSize: "11px", fontWeight: 700, color: "#888888", textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 10px" }}>
                 Update Status — email sent automatically to candidate
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -314,7 +314,7 @@ function AppDetailModal({ app, onClose, onStatusUpdate }: {
                       padding: "6px 14px", fontSize: "12px", fontWeight: 600,
                       border: `2px solid ${s === app.status ? cfg.colour : "#e5e7eb"}`,
                       borderRadius: "20px", cursor: s === app.status ? "default" : "pointer",
-                      background: s === app.status ? cfg.bg : "#fff",
+                      background: s === app.status ? cfg.bg : "#f9f9f9",
                       color: s === app.status ? cfg.colour : "#555",
                       opacity: updatingStatus ? 0.5 : 1,
                       transition: "all 0.15s",
@@ -329,18 +329,18 @@ function AppDetailModal({ app, onClose, onStatusUpdate }: {
 
             {/* Notes */}
             <div>
-              <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--muted-foreground,#888)", textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 8px" }}>HR Notes (internal only)</p>
+              <p style={{ fontSize: "11px", fontWeight: 700, color: "#888888", textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 8px" }}>HR Notes (internal only)</p>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
                 placeholder="Add an internal note — not visible to the candidate..."
-                style={{ width: "100%", border: "1px solid var(--border,#e5e7eb)", borderRadius: "6px", padding: "10px 12px", fontSize: "13px", resize: "none", background: "var(--background,#fff)", color: "var(--foreground,#333)", boxSizing: "border-box" }}
+                style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "10px 12px", fontSize: "13px", resize: "none", background: "#ffffff", color: "#333333", boxSizing: "border-box" }}
               />
               <button
                 onClick={submitNote}
                 disabled={addingNote || !note.trim()}
-                style={{ marginTop: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 600, border: "none", borderRadius: "6px", background: "#1a1a2e", color: "#fff", cursor: "pointer", opacity: (addingNote || !note.trim()) ? 0.5 : 1 }}
+                style={{ marginTop: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 600, border: "none", borderRadius: "6px", background: "#1a1a2e", color: "#ffffff", cursor: "pointer", opacity: (addingNote || !note.trim()) ? 0.5 : 1 }}
               >
                 {addingNote ? "Adding..." : "Add Note"}
               </button>
